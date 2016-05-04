@@ -44,7 +44,7 @@ test 4 识别卡牌费用<br>
 方法二：使用数字识别的方法。     
 有2个场景需要识别费用：      
 场景一：发牌换牌阶段     
-此阶段，背景为黑色，便于分离。流程：灰度化，阈值成二值图像，轮廓提取，测试得到卡牌的轮廓范围，近似矩形，得到卡牌数（得到先手还是后手），根据轮廓得到每个卡牌，对每个卡牌的左上角进行灰度处理，阈值化，轮廓提取，得到数字图像。使用数字识别的方法进行判断。    https://github.com/fztfztfzt/HearthStoneRobot/blob/master/image/scene1_getNum_1.bmp
+此阶段，背景为黑色，便于分离。流程：灰度化，阈值成二值图像，轮廓提取，测试得到卡牌的轮廓范围，近似矩形，得到卡牌数（得到先手还是后手），根据轮廓得到每个卡牌，对每个卡牌的左上角进行灰度处理，阈值化，轮廓提取，得到数字图像。使用数字识别的方法进行判断。     
 结果：![提取卡牌](https://github.com/fztfztfzt/HearthStoneRobot/blob/master/image/scene1_getRect.bmp)   
 ![提取数字](https://github.com/fztfztfzt/HearthStoneRobot/blob/master/image/scene1_getNum_2.bmp)     
 场景二：出牌场景     
