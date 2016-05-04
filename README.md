@@ -44,11 +44,11 @@ test 4 识别卡牌费用<br>
 方法二：使用数字识别的方法。     
 有2个场景需要识别费用：      
 场景一：发牌换牌阶段     
-此阶段，背景为黑色，便于分离。流程：灰度化，阈值成二值图像，轮廓提取，测试得到卡牌的轮廓范围，近似矩形，得到卡牌数（得到先手还是后手），根据轮廓得到每个卡牌，对每个卡牌的左上角进行灰度处理，阈值化，轮廓提取，得到数字图像。使用数字识别的方法进行判断。    
-结果：![提取卡牌](https://github.com/fztfztfzt/HearthStoneRobot/master/image/scene1_getRect.bmp)    
-![提取数字](https://github.com/fztfztfzt/HearthStoneRobot/master/image/scene1_getNum_2.bmp)     
+此阶段，背景为黑色，便于分离。流程：灰度化，阈值成二值图像，轮廓提取，测试得到卡牌的轮廓范围，近似矩形，得到卡牌数（得到先手还是后手），根据轮廓得到每个卡牌，对每个卡牌的左上角进行灰度处理，阈值化，轮廓提取，得到数字图像。使用数字识别的方法进行判断。    https://github.com/fztfztfzt/HearthStoneRobot/blob/master/image/scene1_getNum_1.bmp
+结果：![提取卡牌](https://github.com/fztfztfzt/HearthStoneRobot/blob/master/image/scene1_getRect.bmp)   
+![提取数字](https://github.com/fztfztfzt/HearthStoneRobot/blob/master/image/scene1_getNum_2.bmp)     
 场景二：出牌场景     
 此阶段，背景色彩多样，不能采用场景一的方式，经观察，发现数字部分为白色，且形状接近矩形（宽小于高），测试流程：     
 遍历图像，白色部分不变，其他变为黑色，轮廓提取，去除过小的，近似矩形，去除宽大于等于高的，剩下部分均为数字。     
-结果：![提取数字](https://github.com/fztfztfzt/HearthStoneRobot/master/image/scene2_getNum.bmp)   
+结果：![提取数字](https://github.com/fztfztfzt/HearthStoneRobot/blob/master/image/scene2_getNum.bmp)   
 
