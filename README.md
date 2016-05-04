@@ -36,7 +36,7 @@ test 3 控制鼠标操作<br>
 经测试，炉石传说对方法一的消息不响应，即使设置窗口为`SetForegroundWindow`<br>
 故采用第二种方式，第二种方式要求窗口在最前面，且固定位置，因此将窗口移到左上角，固定分辨率。代码见`controlMouse.cpp`<br>
 test 4 识别卡牌费用<br>
-有2种方法，代码见`test/HStest.cpp`：
+有2种方法，代码见`test/HStest.cpp`：   
 方法一：使用图像查找比较的方法。经测试，有如下问题：    
         1.图片大小不好统一   
         2.图片背景因为有粒子的变化，变动较大       
@@ -52,3 +52,5 @@ test 4 识别卡牌费用<br>
 遍历图像，白色部分不变，其他变为黑色，轮廓提取，去除过小的，近似矩形，去除宽大于等于高的，剩下部分均为数字。     
 结果：![提取数字](https://github.com/fztfztfzt/HearthStoneRobot/blob/master/image/scene2_getNum.bmp)   
 
+难点解决完毕
+项目环境：VS2013+opencv,opencv主要是使用提取轮廓函数，操作方便
