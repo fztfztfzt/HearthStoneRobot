@@ -3,13 +3,15 @@
 #include<fstream>
 #include<iostream>
 #include <opencv2\opencv.hpp>
+#include "processImage.h"
+#include "gameInfo.h"
 using namespace std;
 using namespace cv;
-#pragma comment( linker, "/subsystem:windows /entry:mainCRTStartup" )
-void SaveHwndToBmpFile(HWND hWnd)
+//#pragma comment( linker, "/subsystem:windows /entry:mainCRTStartup" )
+Mat getCurrentImage(HWND hWnd)
 {
 	HDC hDC = ::GetWindowDC(hWnd);//得到句柄
-	if (hDC == NULL) return;
+	assert(hDC);
 
 	HDC hMemDC = ::CreateCompatibleDC(hDC);//建立兼容dc
 
@@ -40,15 +42,22 @@ void SaveHwndToBmpFile(HWND hWnd)
 	::GetDIBits(hMemDC, hBitmap, 0, height, data, (BITMAPINFO*)&bi, DIB_RGB_COLORS);//将画面输出到data中
 	Mat image(height, width, CV_8UC3, data);//将uchar转换为mat类型，用于opencv
 	flip(image, image, 0);//图像上下反转
-	imshow("test", image);
-	waitKey(0);
+
 	::SelectObject(hMemDC, hOldBmp);
 	::DeleteObject(hBitmap);
 	::DeleteObject(hMemDC);
 	::ReleaseDC(hWnd, hDC);
+	return image;
 }
 int main()
 {
 	HWND hWnd = ::FindWindow("UnityWndClass", ("炉石传说"));
-	SaveHwndToBmpFile(hWnd);
+	Mat image = getCurrentImage(hWnd);
+	imshow("test", image);
+	processImage process;
+	cardInfo cinfo;
+	process.process(image,cinfo);
+	for (int i = 0; i < cinfo.currentNum; ++i)
+		cout << "cardnum:" << cinfo.handCard[i] << endl;
+	waitKey(0);
 }
