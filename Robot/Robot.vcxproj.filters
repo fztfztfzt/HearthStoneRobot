@@ -26,5 +26,14 @@
     <ClInclude Include="gameInfo.h">
       <Filter>源文件</Filter>
     </ClInclude>
+    <ClInclude Include="ControlMouse.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ai.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="define.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

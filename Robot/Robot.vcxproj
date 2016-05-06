@@ -71,6 +71,9 @@
     <ClCompile Include="robot.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ai.h" />
+    <ClInclude Include="ControlMouse.h" />
+    <ClInclude Include="define.h" />
     <ClInclude Include="gameInfo.h" />
     <ClInclude Include="processImage.h" />
   </ItemGroup>
