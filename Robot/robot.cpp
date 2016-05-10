@@ -10,57 +10,18 @@
 using namespace std;
 using namespace cv;
 //#pragma comment( linker, "/subsystem:windows /entry:mainCRTStartup" )
-Mat getCurrentImage(HWND hWnd)
-{
-	HDC hDC = ::GetWindowDC(hWnd);//得到句柄
-	assert(hDC);
-
-	HDC hMemDC = ::CreateCompatibleDC(hDC);//建立兼容dc
-
-	assert(hMemDC);
-
-	RECT rc;
-//	::GetWindowRect(hWnd, &rc);//此矩形包括程序外边框
-	::GetClientRect(hWnd, &rc);//得到界面部分矩形大小
-	HBITMAP hBitmap = ::CreateCompatibleBitmap(hDC, rc.right - rc.left, rc.bottom - rc.top);//兼容位图
-	assert(hBitmap);
-
-	HBITMAP hOldBmp = (HBITMAP)::SelectObject(hMemDC, hBitmap);
-
-	::PrintWindow(hWnd, hMemDC, PW_CLIENTONLY);//得到画面
-
-	int width = rc.right - rc.left;
-	int height = rc.bottom - rc.top;
-	BITMAPINFOHEADER bi = { 0 };
-	CONST int nBitCount = 24;
-	bi.biSize = sizeof(BITMAPINFOHEADER);
-	bi.biWidth = width;
-	bi.biHeight = height;
-	bi.biPlanes = 1;
-	bi.biBitCount = nBitCount;
-	bi.biCompression = BI_RGB;
-	DWORD dwSize = width * 3 * height;
-	unsigned char *data = new unsigned char[dwSize];
-	::GetDIBits(hMemDC, hBitmap, 0, height, data, (BITMAPINFO*)&bi, DIB_RGB_COLORS);//将画面输出到data中
-	Mat image(height, width, CV_8UC3, data);//将uchar转换为mat类型，用于opencv
-	flip(image, image, 0);//图像上下反转
-
-	::SelectObject(hMemDC, hOldBmp);
-	::DeleteObject(hBitmap);
-	::DeleteObject(hMemDC);
-	::ReleaseDC(hWnd, hDC);
-	return image;
-}
 int main()
 {
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	SMALL_RECT rc = { 1400, 0, 120, 30 };
+	SetConsoleWindowInfo(hOut, true, &rc);
 	HWND hWnd = ::FindWindow("UnityWndClass", ("炉石传说"));
-	ProcessImage processImage;
+	ProcessImage *processImage =ProcessImage::getInstance();
 	GameInfo gameInfo;
 	AI aiControl(hWnd);
 	while (1)
 	{
-		Mat image = getCurrentImage(hWnd);
-		processImage.process(image, gameInfo);
+		processImage->process(gameInfo);
 		aiControl.process(gameInfo);
 		Sleep(1000);
 	}
