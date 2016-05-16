@@ -56,7 +56,7 @@ public:
 			break;
 		case STATE_FIGHTSTART:
 			cout << "游戏阶段：开始战斗阶段，延时10秒" << endl;
-			Sleep(10000);//等待发牌结束
+			Sleep(1000);//等待发牌结束
 			gameInfo.state = STATE_OTHERTURN;
 			break;
 		case STATE_SELFTURN_PLAY:

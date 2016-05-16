@@ -66,6 +66,10 @@ class ProcessImage
 
 		hWnd = ::FindWindow("UnityWndClass", ("炉石传说"));
 	}
+
+	Mat selfFloorBG;
+	Mat otherFloorBG;
+	Mat weaponBG;
 public:
 	static ProcessImage* getInstance()
 	{
@@ -84,6 +88,9 @@ public:
 		case STATE_CHANGECARDSTART:
 			changeCardStart(src, gameInfo);
 			break;
+		case STATE_FIGHTSTART:
+			fightStart(src);
+			break;
 		case STATE_SELFTURN_PLAY:
 			selfTurn(src, gameInfo);
 			break;
@@ -96,6 +103,16 @@ public:
 		default:
 			break;
 		}
+	}
+	void fightStart(Mat &src)
+	{
+		
+		src(Rect(166, 363, 680, 115)).copyTo(selfFloorBG);
+		imwrite("HS/self_floor.png", selfFloorBG);
+		src(Rect(204, 229, 630, 118)).copyTo(otherFloorBG);
+		imwrite("HS/other_floor.png", otherFloorBG);
+		src(Rect(337, 534, 112, 110)).copyTo(weaponBG);
+		imwrite("HS/weaponBG.png", weaponBG);
 	}
 	void changeCardStart(Mat src, GameInfo &gameInfo)//预处理发牌阶段图像
 	{
@@ -421,15 +438,16 @@ public:
 	}
 	void recoSelfMonster(Mat src, GameInfo &gameInfo)
 	{
-		Mat floor = imread("HS/self_floor.png",0);
+		Mat floor = imread("HS/self_floor.png",1);
 		Mat out;
-		Mat gray;
+		Mat gray,floor_gray;
 		cvtColor(src, gray, CV_BGR2GRAY);
-		//imshow("yuan", gray);
+		cvtColor(floor, floor_gray, CV_BGR2GRAY);
+		//imshow("yuan", src);
 		//imshow("floor", floor);
-		subtract(floor, gray,out);
-		/*imshow("test", out);
-		waitKey(0);*/
+		subtract(floor_gray, gray, out);
+		//imshow("test", out);
+		//waitKey(0);
 		Mat thr;
 		threshold(out, thr, 40, 255, CV_THRESH_BINARY);
 		Mat element = getStructuringElement(MORPH_RECT, Size(3, 3));//腐蚀膨胀效果不好
@@ -447,18 +465,18 @@ public:
 			CV_CHAIN_APPROX_NONE);		//轮廓近似的方法（这里不近似，获取全部轮廓）
 
 		int cmin = 300;
-		//Mat matio;
+		Mat matio;
 		gameInfo.selfMonsterNum = 0;
 		for (int i = 0; i < contours.size(); ++i)
 		{
 			cout << "识别自己场上随从：" << contours[i].size() << endl;
 			if ((int)contours[i].size() > cmin)
 			{
-				cout <<contours[i].size() << endl;
+				//cout <<contours[i].size() << endl;
 				Rect r0 = boundingRect(Mat(contours[i]));
-				cout << r0.x << " " << r0.y << " " << r0.width << " " << r0.height << endl;
+				//cout << r0.x << " " << r0.y << " " << r0.width << " " << r0.height << endl;
 			//	if (r0.width >= r0.height) continue;
-				//src(r0).copyTo(matio);
+				src(r0).copyTo(matio);
 				/*imshow("tests",matio);
 				waitKey(0);*/
 				int x = r0.x + r0.width / 2;
@@ -483,17 +501,7 @@ public:
 			}
 		}
 
-		//判断英雄是否有武器
-		Mat weapon;
-		src(Rect(337, 534, 112, 110)).copyTo(weapon);
-		Mat weaponBG = imread("weaponBG.png");
-		int rs = compareImage(weapon, weaponBG);
-		if (rs < 10)
-		{
-			gameInfo.selfMonster[gameInfo.selfMonsterNum].x = 520;
-			gameInfo.selfMonster[gameInfo.selfMonsterNum].y = 620;
-			gameInfo.selfMonsterNum++;
-		}
+		
 	}
 	bool isTaunt(Mat src)
 	{
@@ -605,6 +613,22 @@ public:
 		Mat selfFloor;
 		src(Rect(166, 363, 680, 115)).copyTo(selfFloor);
 		recoSelfMonster(selfFloor, gameInfo);
+		//判断英雄是否有武器
+		Mat weapon;
+		src(Rect(337, 534, 112, 110)).copyTo(weapon);
+		Mat weaponBG = imread("HS/weaponBG.png");
+		int rs = compareImage(weapon, weaponBG);
+		/*imshow("wuqi", weapon);
+		imshow("bg", weaponBG);
+		cout << "武器匹配度："<<rs << endl;
+		waitKey(0);*/
+		if (rs < 10)
+		{
+			cout << "英雄有武器" << endl;
+			gameInfo.selfMonster[gameInfo.selfMonsterNum].x = 520;
+			gameInfo.selfMonster[gameInfo.selfMonsterNum].y = 620;
+			gameInfo.selfMonsterNum++;
+		}
 		//识别对方场上随从
 		Mat otherFloor;
 		src(Rect(204, 229, 630, 118)).copyTo(otherFloor);
@@ -693,9 +717,11 @@ public:
 		//3.过滤匹配点
 		double max_dist = 0; double min_dist = 100;
 		//-- Quick calculation of max and min distances between keypoints
+		cout << "武器匹配" << endl;
 		for (int i = 0; i < descriptors_1.rows; i++)
 		{
 			double dist = matches[i].distance;
+			cout << ":"<<dist << endl;
 			if (dist < min_dist) min_dist = dist;
 			if (dist > max_dist) max_dist = dist;
 		}
@@ -707,7 +733,7 @@ public:
 		std::vector< DMatch > good_matches;
 		for (int i = 0; i < descriptors_1.rows; i++)
 		{
-			if (matches[i].distance < 0.6*max_dist)
+			if (matches[i].distance <= 0.6*max_dist)
 			{
 				good_matches.push_back(matches[i]);
 			}
