@@ -482,6 +482,18 @@ public:
 				
 			}
 		}
+
+		//判断英雄是否有武器
+		Mat weapon;
+		src(Rect(337, 534, 112, 110)).copyTo(weapon);
+		Mat weaponBG = imread("weaponBG.png");
+		int rs = compareImage(weapon, weaponBG);
+		if (rs < 10)
+		{
+			gameInfo.selfMonster[gameInfo.selfMonsterNum].x = 520;
+			gameInfo.selfMonster[gameInfo.selfMonsterNum].y = 620;
+			gameInfo.selfMonsterNum++;
+		}
 	}
 	bool isTaunt(Mat src)
 	{
@@ -663,6 +675,44 @@ public:
 			gameInfo.state = STATE_SELFTURN_PLAY;
 			selfTurn(src, gameInfo);
 		}
+	}
+	int compareImage(Mat &a, Mat &b)
+	{
+		ORB orb;
+		vector<KeyPoint> keyPoints_1, keyPoints_2;
+		Mat descriptors_1, descriptors_2;
+		orb(a, Mat(), keyPoints_1, descriptors_1);
+		orb(b, Mat(), keyPoints_2, descriptors_2);
+		//	cout << clock() - t_start << endl;
+		//2.BruteForceMatcher匹配
+		BruteForceMatcher<HammingLUT> matcher;  //也可以使用ruteForce<Hamming>
+		vector<DMatch> matches;
+		matcher.match(descriptors_1, descriptors_2, matches);
+		//	cout << matches.size() << endl;
+		//	cout << clock() - t_start << endl;
+		//3.过滤匹配点
+		double max_dist = 0; double min_dist = 100;
+		//-- Quick calculation of max and min distances between keypoints
+		for (int i = 0; i < descriptors_1.rows; i++)
+		{
+			double dist = matches[i].distance;
+			if (dist < min_dist) min_dist = dist;
+			if (dist > max_dist) max_dist = dist;
+		}
+		//	printf("-- Max dist : %f \n", max_dist);
+		//	printf("-- Min dist : %f \n", min_dist);
+		//	cout << clock() - t_start << endl;
+		//-- Draw only "good" matches (i.e. whose distance is less than 0.6*max_dist )
+		//-- PS.- radiusMatch can also be used here.
+		std::vector< DMatch > good_matches;
+		for (int i = 0; i < descriptors_1.rows; i++)
+		{
+			if (matches[i].distance < 0.6*max_dist)
+			{
+				good_matches.push_back(matches[i]);
+			}
+		}
+		return (int)good_matches.size();
 	}
 	int compareImageByORB(Mat img_1)
 	{

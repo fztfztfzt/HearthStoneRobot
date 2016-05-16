@@ -15,6 +15,7 @@ public:
 	{
 		mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, x / screenWidth * 65535, y / screenHeight * 65535, 0, 0);
 		mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+		Sleep(1000);
 	}
 	void playCard(double x, double y)//出牌
 	{
@@ -33,9 +34,10 @@ public:
 		mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
 		Sleep(500);
 	}
-	void moveToPosition(double x, double y)//点击坐标位置
+	void moveToPosition(double x, double y)//移动到坐标位置
 	{
 		mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, x / screenWidth * 65535, y / screenHeight * 65535, 0, 0);
+		Sleep(1000);
 	}
 	void fightMonster(double x, double y, double x1, double y1)
 	{
