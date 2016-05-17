@@ -3,6 +3,10 @@
 #include "gameInfo.h"
 #include "ControlMouse.h"
 #include "define.h"
+bool cmp(Card a, Card b)
+{
+	return a.spend < b.spend;
+}
 class AI
 {
 	HWND hWnd;
@@ -11,76 +15,142 @@ public:
 	AI(HWND h) :hWnd(h){
 		controlMouse = ControlMouse::getInstance();
 	}
+	void startGame(GameInfo &gameInfo)
+	{
+		cout << "游戏阶段：开始新的一轮练习模式,选择术士，点击开始按钮，延时1秒" << endl;
+		//练习模式：
+		controlMouse->touchPosition(835,655);//点击选择按钮
+		controlMouse->touchPosition(845, 495);//选择术士
+		controlMouse->touchPosition(850, 645);//点击开始按钮
+		Sleep(1000);//延时1s
+		gameInfo.state = STATE_CHANGECARDSTART;
+	}
+	void changeCardStart(GameInfo &gameInfo)
+	{
+		cout << "游戏阶段：换牌阶段开始" << endl;
+		cout << "识别卡牌数：" << gameInfo.currentNum << endl;
+		if (gameInfo.currentNum == 3)
+		{
+			gameInfo.first = true;
+		}
+		else if (gameInfo.currentNum == 4)
+		{
+			gameInfo.first = false;
+		}
+		else
+		{
+			cout << "换牌个数识别错误" << endl;
+			return;//识别错误
+		}
+		string NoChangeCard[4] = { "狼人渗透者", "麻疯侏儒", "疯狂的科学家", "鬼灵爬行者" };
+		for (int i = 0; i < gameInfo.currentNum; ++i)
+		{
+			int flag = false;
+			for (int j = 0; j < 4; ++j)
+			{
+				if (gameInfo.handCard[i].name == NoChangeCard[j])
+				{
+					flag = true;
+				}
+			}
+			if (!flag)
+			{
+				cout << "更换卡牌：" << gameInfo.handCard[i].name << endl;
+				controlMouse->touchPosition(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
+			}
+		}
+		gameInfo.state = STATE_CHANGECARDEND;
+	}
+	
 	void process(GameInfo &gameInfo)
 	{
-		string NoChangeCard[4] = { "狼人渗透者", "麻疯侏儒", "疯狂的科学家", "鬼灵爬行者" };
 		switch (gameInfo.state)
 		{
 		case STATE_STARTGAME:
-			cout << "游戏阶段：开始游戏,点击开始按钮，延时1秒" << endl;
-			controlMouse->touchPosition(800, 600);//点击开始
-			Sleep(1000);
-			gameInfo.state = STATE_CHANGECARDSTART;
+			startGame(gameInfo);
 			break;
 		case STATE_CHANGECARDSTART:
-			cout << "游戏阶段：换牌阶段开始，识别卡牌数：" << gameInfo.currentNum << endl;
-			if (gameInfo.currentNum < 3) break;
-			if (gameInfo.currentNum == 3) gameInfo.first = true;
-			else gameInfo.first = false;
-			
-			for (int i = 0; i < gameInfo.currentNum; ++i)
-			{
-				int flag = false;
-				for (int j = 0; j < 4; ++j)
-				{
-					if (gameInfo.handCard[i].name == NoChangeCard[j])
-					{
-						flag = true;
-					}
-				}
-				if (!flag)
-				{
-					cout << "更换卡牌,延时0.1秒：" << gameInfo.handCard[i].name << endl;
-					controlMouse->touchPosition(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
-					Sleep(100);
-				}
-			}
-			gameInfo.state = STATE_CHANGECARDEND;
+			changeCardStart(gameInfo);			
 			break;
 		case STATE_CHANGECARDEND:
-			cout << "游戏阶段：换牌阶段结束，点击确定按钮，延时3秒" << endl;
+			cout << "游戏阶段：换牌阶段结束，点击确定按钮" << endl;
 			//确定
 			controlMouse->touchPosition(500, 600);
-			Sleep(3000);
 			gameInfo.state = STATE_FIGHTSTART;
+			Sleep(10000);//等待发牌结束
 			break;
 		case STATE_FIGHTSTART:
 			cout << "游戏阶段：开始战斗阶段，延时10秒" << endl;
-			Sleep(1000);//等待发牌结束
+			
 			gameInfo.state = STATE_OTHERTURN;
 			break;
 		case STATE_SELFTURN_PLAY:
-			cout << "游戏阶段：自己出牌阶段，延时2秒" << endl;
+			cout << "游戏阶段：自己出牌阶段" << endl;
 			Sleep(2000);
 			gameInfo.currentSpend++;
 			gameInfo.couldUseSpend = gameInfo.currentSpend;
+			//将手牌按费用排序
+			sort(gameInfo.handCard, gameInfo.handCard + gameInfo.currentNum, cmp);
+			/*for (int i = 0; i < gameInfo.currentNum; ++i)
+			{
+				cout << gameInfo.handCard[i].name;
+			}*/
+			if (gameInfo.currentSpend == 1)//1费情况
+			{
+				int havePlayNum = 0;
+				for (int i = 0; i < gameInfo.currentNum; ++i)
+				{
+					if (gameInfo.handCard[i].behavior == "下场" && gameInfo.handCard[i].spend == 1)
+					{
+						if (gameInfo.couldUseSpend == 0)
+						{
+							if (!gameInfo.first)
+							{
+								controlMouse->playCard(gameInfo.handCard[0].x, gameInfo.handCard[0].y);//幸运币
+								++gameInfo.couldUseSpend;
+							}
+						}
+						if (gameInfo.couldUseSpend > 0)
+						{
+							cout << "ai:出牌：费用" << gameInfo.handCard[i].spend << " 可用费用：" << gameInfo.couldUseSpend << " 位置：" << gameInfo.handCard[i].x << " " << gameInfo.handCard[i].y << endl;
+							controlMouse->playCard(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
+							gameInfo.couldUseSpend -= gameInfo.handCard[i].spend;
+							++havePlayNum;//已出牌数量+1，不包括幸运币
+							Sleep(100);
+						}
+					}
+					if (gameInfo.handCard[i].spend > 1 && havePlayNum > 0)
+					{
+						break;
+					}
+					else
+					{
+						if (!gameInfo.first && gameInfo.handCard[i].behavior == "下场" && gameInfo.handCard[i].spend == 2)
+						{
+							controlMouse->playCard(gameInfo.handCard[0].x, gameInfo.handCard[0].y);//幸运币
+							++gameInfo.couldUseSpend;
+							cout << "ai:出牌：费用" << gameInfo.handCard[i].spend << " 可用费用：" << gameInfo.couldUseSpend << " 位置：" << gameInfo.handCard[i].x << " " << gameInfo.handCard[i].y << endl;
+							controlMouse->playCard(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
+							gameInfo.couldUseSpend -= gameInfo.handCard[i].spend;
+							++havePlayNum;//已出牌数量+1，不包括幸运币
+							Sleep(100);
+							break;
+						}
+					}
+				}
+			}
+			
 			for (int i = 0; i < gameInfo.currentNum; ++i)//最简单的AI，有啥出啥
 			{
-				if (gameInfo.handCard[i].behavior == "下场" && gameInfo.handCard[i].spend <= gameInfo.couldUseSpend)
+				if (gameInfo.handCard[i].behavior == "下场" && gameInfo.handCard[i].spend!=0 && gameInfo.handCard[i].spend <= gameInfo.couldUseSpend)
 				{
-					cout << "ai:出牌：费用" << gameInfo.handCard[i].spend << "可用费用：" << gameInfo.couldUseSpend << "位置：" << gameInfo.handCard[i].x << " " << gameInfo.handCard[i].y << endl;
+					cout << "ai:出牌：费用" << gameInfo.handCard[i].spend << " 可用费用：" << gameInfo.couldUseSpend << " 位置：" << gameInfo.handCard[i].x << " " << gameInfo.handCard[i].y << endl;
 					controlMouse->playCard(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
 					gameInfo.couldUseSpend -= gameInfo.handCard[i].spend;
 					Sleep(100);
 				}
 			}
 
-			/*for (int i = 0; i < 15; ++i)
-			{
-				controlMouse->playCardToPlayer(140+60*i,460);
-				Sleep(500);
-			}*/
-		//	controlMouse->touchPosition(900, 350);//点击回合结束
 			gameInfo.state = STATE_SELFTURN_FIGHT;
 			
 			controlMouse->moveToPosition(1000, 700);

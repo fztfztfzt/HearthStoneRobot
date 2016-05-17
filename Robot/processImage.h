@@ -106,16 +106,25 @@ public:
 	}
 	void fightStart(Mat &src)
 	{
-		
+
+		//截取背景
 		src(Rect(166, 363, 680, 115)).copyTo(selfFloorBG);
 		imwrite("HS/self_floor.png", selfFloorBG);
 		src(Rect(204, 229, 630, 118)).copyTo(otherFloorBG);
 		imwrite("HS/other_floor.png", otherFloorBG);
 		src(Rect(337, 534, 112, 110)).copyTo(weaponBG);
 		imwrite("HS/weaponBG.png", weaponBG);
+
+
 	}
 	void changeCardStart(Mat src, GameInfo &gameInfo)//预处理发牌阶段图像
 	{
+		Mat sure;
+		src(Rect(475, 595, 80, 25)).copyTo(sure);
+		Mat sureBG = imread("HS/sure.png");
+		float ratio = compareImageBySub(sure, sureBG);
+		cout <<"有确认按钮可能性：" <<ratio*100 <<"%"<< endl;
+		if (ratio < 0.9) return;//知道有确认按钮（动画结束）时才进行下一步
 		for (int i = 0; i<src.rows; i++)//阈值处理，白色留下，其余改为黑色
 		{
 			for (int j = 0; j<src.cols; j++)
@@ -688,6 +697,7 @@ public:
 	}
 	void otherTrun(Mat src, GameInfo &gameInfo)
 	{
+		Sleep(1000);
 		Mat image;
 		src(Rect(924, 340, 45, 10)).copyTo(image);
 		int i = 0, j = 0;
@@ -699,6 +709,29 @@ public:
 			gameInfo.state = STATE_SELFTURN_PLAY;
 			selfTurn(src, gameInfo);
 		}
+	}
+	float compareImageBySub(Mat &a, Mat &a2)
+	{
+		int sum = 0;
+		for (int i = 0; i<a.rows; i++)//阈值处理，白色留下，其余改为黑色
+		{
+			for (int j = 0; j<a.cols; j++)
+			{
+				uchar r = a.at<Vec3b>(i, j)[0];
+				uchar g = a.at<Vec3b>(i, j)[1];
+				uchar b = a.at<Vec3b>(i, j)[2];
+
+				uchar r2 = a2.at<Vec3b>(i, j)[0];
+				uchar g2 = a2.at<Vec3b>(i, j)[1];
+				uchar b2 = a2.at<Vec3b>(i, j)[2];
+				if (abs(r - r2)<20 && abs(b2 - b)<20 && abs(g - g2)<20)
+				{
+					sum++;	
+				}
+				
+			}
+		}
+		return (float)sum/(a.rows*a.cols);
 	}
 	int compareImage(Mat &a, Mat &b)
 	{
@@ -717,7 +750,6 @@ public:
 		//3.过滤匹配点
 		double max_dist = 0; double min_dist = 100;
 		//-- Quick calculation of max and min distances between keypoints
-		cout << "武器匹配" << endl;
 		for (int i = 0; i < descriptors_1.rows; i++)
 		{
 			double dist = matches[i].distance;
