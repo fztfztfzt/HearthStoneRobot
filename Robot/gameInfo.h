@@ -31,8 +31,8 @@ class GameInfo
 public:
 	GameInfo()
 	{
-		state = STATE_STARTGAME;
-		currentSpend = 0;
+		state = STATE_SELFTURN_FIGHT;
+		currentSpend = 1;
 	}
 	STATE state;
 	Card handCard[10];// ÷≈∆¥Û–°
