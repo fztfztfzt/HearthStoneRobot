@@ -12,6 +12,7 @@ class AI
 {
 	HWND hWnd;
 	ControlMouse *controlMouse;
+	int havePlayNum;
 public:
 	AI(HWND h) :hWnd(h){
 		controlMouse = ControlMouse::getInstance();
@@ -87,7 +88,7 @@ public:
 			break;
 		case STATE_SELFTURN_PLAY:
 			cout << "游戏阶段：自己出牌阶段" << endl;
-			
+			cout << "当前费用：" << gameInfo.currentSpend << " 可用费用:" << gameInfo.couldUseSpend << endl;
 			
 			//将手牌按费用排序
 			sort(gameInfo.handCard, gameInfo.handCard + gameInfo.currentNum, cmp);
@@ -97,7 +98,7 @@ public:
 			}*/
 			//if (gameInfo.currentSpend == 1)//1费情况
 			{
-				int havePlayNum = 0;
+				
 				for (int i = 0; i < gameInfo.currentNum; ++i)
 				{
 					if (!gameInfo.first && gameInfo.handCard[i].behavior == "下场" && gameInfo.handCard[i].spend == gameInfo.couldUseSpend + 1)
@@ -123,12 +124,24 @@ public:
 						controlMouse->playCard(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
 						gameInfo.couldUseSpend -= gameInfo.handCard[i].spend;
 						++havePlayNum;//已出牌数量+1，不包括幸运币
-						Sleep(100);
+						return;//重新扫描，确认手牌位置
 						
 					}
 				
 					
 					
+				}
+
+				for (int i = 0; i < gameInfo.currentNum; ++i)
+				{
+					if (gameInfo.handCard[i].behavior == "敌人" && gameInfo.handCard[i].spend <= gameInfo.couldUseSpend)
+					{
+						cout << "ai:出牌：" << gameInfo.handCard[i].name<<" 费用" << gameInfo.handCard[i].spend << " 可用费用：" << gameInfo.couldUseSpend << " 位置：" << gameInfo.handCard[i].x << " " << gameInfo.handCard[i].y << endl;
+						controlMouse->playCardToPlayer(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
+						gameInfo.couldUseSpend -= gameInfo.handCard[i].spend;
+						++havePlayNum;//已出牌数量+1，不包括幸运币
+						return;//重新扫描，确认手牌位置
+					}
 				}
 			}
 			
@@ -160,19 +173,11 @@ public:
 						flag = true;
 						controlMouse->fightMonster(gameInfo.selfMonster[i].x, gameInfo.selfMonster[i].y, gameInfo.otherMonster[j].x, gameInfo.otherMonster[j].y);
 						cout << gameInfo.selfMonster[i].name << "攻击，对象位置：" << gameInfo.otherMonster[j].x<<gameInfo.otherMonster[j].y << endl;
-						break;
+						cout << "重新扫描场上随从" << endl;
+						return;
 					}
 				}
-				if (flag)
-				{
-					cout << "重新扫描对方场上随从" << endl;
-					ProcessImage *processImage = ProcessImage::getInstance();
-					Mat src = processImage->getCurrentImage();
-					Mat otherFloor;
-					src(Rect(204, 229, 630, 118)).copyTo(otherFloor);
-					processImage->recoOtherMonster(otherFloor, gameInfo);
-				}
-				else
+				if (!flag)
 				{
 					controlMouse->playCardToPlayer(gameInfo.selfMonster[i].x, gameInfo.selfMonster[i].y);
 					cout << gameInfo.selfMonster[i].name << "攻击玩家" << endl;
@@ -184,6 +189,7 @@ public:
 			gameInfo.state = STATE_OTHERTURN;//改变游戏状态
 			gameInfo.currentSpend++;
 			gameInfo.couldUseSpend = gameInfo.currentSpend;
+			havePlayNum = 0;
 			controlMouse->touchPosition(EndTurnX, EndTurnY);//点击回合结束
 			
 			controlMouse->moveToPosition(OutSideX, OutSideY);//移动到场景外，防止干扰

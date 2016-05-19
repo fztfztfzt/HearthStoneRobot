@@ -568,7 +568,7 @@ public:
 				uchar r = src2.at<Vec3b>(i, j)[0];
 				uchar g = src2.at<Vec3b>(i, j)[1];
 				uchar b = src2.at<Vec3b>(i, j)[2];
-				if (r>50 && g>50 && b>50 && abs(r-g)<20 && abs(r-b)<20 && abs(g-b)<20)
+				if (r<200 && g<200 && b<200 && r>40 && g>40 && b>40 && abs(r - g)<15 && abs(r - b)<15 && abs(g - b)<15)
 				{
 					sum++;
 					image.at<Vec3b>(i, j)[0] = 255;
@@ -625,8 +625,8 @@ public:
 			Rect r0(bg + i * 96, 0, 96, thr.rows);
 			Mat temp;
 			src(r0).copyTo(temp);
-			imshow("tests", temp);
-			waitKey(0);
+			/*imshow("tests", temp);
+			waitKey(0);*/
 			int x = r0.x+r0.width / 2+10;
 			int y = r0.height/2;
 			x += 204;
