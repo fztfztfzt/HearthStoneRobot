@@ -18,6 +18,7 @@ vector<vector<vector<bool>>> numModel;
 class ProcessImage
 {
 	vector<Card> allCards;
+	
 	HWND hWnd;
 	static ProcessImage* self;
 	ProcessImage(){
@@ -318,6 +319,7 @@ public:
 	void recoHandCrad(Mat src, GameInfo &gameInfo)
 	{
 		//识别手牌
+		clock_t startT = clock();
 		Mat image, src2;
 		src(Rect(260, 660, 440, src.rows - 660)).copyTo(src2);
 		src2.copyTo(image);
@@ -358,6 +360,8 @@ public:
 			//包含图像拓扑结构的信息（可选参数，这里没有选）
 			CV_RETR_EXTERNAL,			//获取轮廓的方法（这里获取外围轮廓）
 			CV_CHAIN_APPROX_NONE);		//轮廓近似的方法（这里不近似，获取全部轮廓）
+		double durationT = (double)(clock() - startT) / CLOCKS_PER_SEC;
+		cout << "手牌识别阶段，提取出数字部分用时:" << durationT << "秒" << endl;
 		//打印轮廓信息
 		//std::cout << "共有外围轮廓：" << contours.size() << "条" << std::endl;
 		//std::vector<std::vector<Point>>::const_iterator itContours = contours.begin();
@@ -424,8 +428,10 @@ public:
 			image(r1).copyTo(image1);
 			/*imshow("test", image1);
 			waitKey(0);*/
+			clock_t start = clock();
 			int cardID = compareImageByORB(image1);
-
+			double duration = (double)(clock() - start) / CLOCKS_PER_SEC;
+			cout << "比较一张卡牌用时:" << duration << "秒" << endl;
 			gameInfo.handCard[gameInfo.currentNum] = allCards[cardID];
 			gameInfo.handCard[gameInfo.currentNum].x = x;
 			gameInfo.handCard[gameInfo.currentNum].y = y;
@@ -484,6 +490,7 @@ public:
 		{
 			Rect r0(bg + i * 96, 0, 96, thr.rows);
 			Mat temp;
+			if (r0.x + r0.width>src.cols || r0.y+r0.height>src.rows) continue;
 			src(r0).copyTo(temp);
 			/*imshow("tests", temp);
 			waitKey(0);*/
@@ -586,7 +593,7 @@ public:
 		cout << "sum:" << sum << "宽 高:" << src2.rows << " "<<src2.cols << endl;
 		/*imshow("image", image);
 		waitKey(0);*/
-		return sum>3000;
+		return sum>2800;
 	}
 	void recoOtherMonster(Mat src, GameInfo &gameInfo)
 	{
@@ -624,6 +631,7 @@ public:
 		{
 			Rect r0(bg + i * 96, 0, 96, thr.rows);
 			Mat temp;
+			if (r0.x + r0.width>src.cols || r0.y + r0.height>src.rows) continue;
 			src(r0).copyTo(temp);
 			/*imshow("tests", temp);
 			waitKey(0);*/
@@ -690,8 +698,11 @@ public:
 	}
 	void selfTurn(Mat src, GameInfo &gameInfo)//处理出牌阶段场景
 	{
-		
+		clock_t start = clock();
 		recoHandCrad(src, gameInfo);
+		double duration = (double)(clock() - start) / CLOCKS_PER_SEC;
+		cout << "识别手牌总用时:"<<duration<<"秒"<< endl;
+
 		/*ControlMouse *controlMouse = ControlMouse::getInstance();
 		controlMouse->moveToPosition(1000, 700);
 		Sleep(1000);*/
@@ -712,15 +723,19 @@ public:
 		src(Rect(166, 363, 680, 115)).copyTo(selfFloor);
 		recoSelfMonster(selfFloor, gameInfo);
 		cout << "判断英雄是否有武器" << endl;
+		clock_t start = clock();
 		Mat weapon;
 		src(Rect(337, 534, 112, 110)).copyTo(weapon);
 		Mat weaponBG = imread("HS/weaponBG.png");
-		int rs = compareImage(weapon, weaponBG);
+		double rs = compareImageBySub(weapon, weaponBG);
 		/*imshow("wuqi", weapon);
 		imshow("bg", weaponBG);
-		cout << "武器匹配度："<<rs << endl;
+		
 		waitKey(0);*/
-		if (rs < 10)
+		cout << "武器匹配度：" << rs*100<<"%" << endl;
+		double duration = (double)(clock() - start) / CLOCKS_PER_SEC;
+		cout << "判断是否有武器用时:" << duration << "秒" << endl;
+		if (rs < 0.9)
 		{
 			cout << "英雄有武器:"<<rs << endl;
 			gameInfo.selfMonster[gameInfo.selfMonsterNum].x = 520;

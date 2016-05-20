@@ -33,6 +33,7 @@ public:
 	{
 		state = STATE_STARTGAME;
 		currentSpend = 1;
+		couldUseSpend = 1;
 	}
 	STATE state;
 	Card handCard[10];// ÷≈∆¥Û–°

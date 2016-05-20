@@ -79,7 +79,8 @@ public:
 			//确定
 			controlMouse->touchPosition(500, 600);
 			gameInfo.state = STATE_FIGHTSTART;
-			Sleep(10000);//等待发牌结束
+			if(gameInfo.first) Sleep(15000);//等待发牌结束
+			else Sleep(10000);
 			break;
 		case STATE_FIGHTSTART:
 			cout << "游戏阶段：开始战斗阶段，延时10秒" << endl;
@@ -124,6 +125,7 @@ public:
 						controlMouse->playCard(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
 						gameInfo.couldUseSpend -= gameInfo.handCard[i].spend;
 						++havePlayNum;//已出牌数量+1，不包括幸运币
+						if (gameInfo.couldUseSpend + !gameInfo.first < gameInfo.handCard[i].spend) break;//不会在出牌则不用重新扫描
 						return;//重新扫描，确认手牌位置
 						
 					}
@@ -140,6 +142,7 @@ public:
 						controlMouse->playCardToPlayer(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
 						gameInfo.couldUseSpend -= gameInfo.handCard[i].spend;
 						++havePlayNum;//已出牌数量+1，不包括幸运币
+						if (gameInfo.couldUseSpend + !gameInfo.first < gameInfo.handCard[i].spend) break;//不会在出牌则不用重新扫描
 						return;//重新扫描，确认手牌位置
 					}
 				}
