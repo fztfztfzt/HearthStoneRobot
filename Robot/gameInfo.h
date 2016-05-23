@@ -34,6 +34,7 @@ public:
 		state = STATE_STARTGAME;
 		currentSpend = 1;
 		couldUseSpend = 1;
+		haveWeapon = false;
 	}
 	STATE state;
 	Card handCard[10];//手牌大小
@@ -45,5 +46,6 @@ public:
 	bool first;//先后手
 	int currentSpend;//当前水晶数
 	int couldUseSpend;
+	bool haveWeapon;
 
 };

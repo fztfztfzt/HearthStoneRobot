@@ -71,6 +71,8 @@ class ProcessImage
 	Mat selfFloorBG;
 	Mat otherFloorBG;
 	Mat weaponBG;
+	Mat gameOverOtherBG;
+	Mat gameOverSelfBG;
 public:
 	static ProcessImage* getInstance()
 	{
@@ -80,29 +82,48 @@ public:
 		}
 		return self;
 	}
-	
+	bool gameOver()
+	{
+		Sleep(1000);
+		Mat src = getCurrentImage();
+		Mat sub,sub2;
+		src(Rect(460, 75, 110, 120)).copyTo(sub);
+		src(Rect(455, 515, 110, 120)).copyTo(sub2);
+		double b = compareImageBySub(gameOverOtherBG, sub);
+		double b2 = compareImageBySub(gameOverSelfBG, sub2);
+		return b < 0.1 || b2<0.1;
+	}
 	void process(GameInfo &gameInfo)
 	{
 		Mat src = getCurrentImage();
-		switch (gameInfo.state)
+		bool b = gameOver();
+		cout << "ÓÎÏ·½áÊø£º" << b << endl;
+		if (!b)
 		{
-		case STATE_CHANGECARDSTART:
-			changeCardStart(src, gameInfo);
-			break;
-		case STATE_FIGHTSTART:
-			fightStart(src);
-			break;
-		case STATE_SELFTURN_PLAY:
-			selfTurn(src, gameInfo);
-			break;
-		case STATE_SELFTURN_FIGHT:
-			selfTurnFight(src, gameInfo);
-			break;
-		case STATE_OTHERTURN:
-			otherTrun(src, gameInfo);
-			break;
-		default:
-			break;
+			switch (gameInfo.state)
+			{
+			case STATE_CHANGECARDSTART:
+				changeCardStart(src, gameInfo);
+				break;
+			case STATE_FIGHTSTART:
+				fightStart(src);
+				break;
+			case STATE_SELFTURN_PLAY:
+				selfTurn(src, gameInfo);
+				break;
+			case STATE_SELFTURN_FIGHT:
+				selfTurnFight(src, gameInfo);
+				break;
+			case STATE_OTHERTURN:
+				otherTrun(src, gameInfo);
+				break;
+			default:
+				break;
+			}
+		}
+		else
+		{
+			system("pause");
 		}
 	}
 	void fightStart(Mat &src)
@@ -115,8 +136,9 @@ public:
 		imwrite("HS/other_floor.png", otherFloorBG);
 		src(Rect(337, 534, 112, 110)).copyTo(weaponBG);
 		imwrite("HS/weaponBG.png", weaponBG);
-
-
+		Mat sub;
+		src(Rect(460, 75, 110, 120)).copyTo(gameOverOtherBG);
+		src(Rect(455, 515, 110, 120)).copyTo(gameOverSelfBG);
 	}
 	void changeCardStart(Mat src, GameInfo &gameInfo)//Ô¤´¦Àí·¢ÅÆ½×¶ÎÍ¼Ïñ
 	{
@@ -702,7 +724,25 @@ public:
 		recoHandCrad(src, gameInfo);
 		double duration = (double)(clock() - start) / CLOCKS_PER_SEC;
 		cout << "Ê¶±ðÊÖÅÆ×ÜÓÃÊ±:"<<duration<<"Ãë"<< endl;
+		cout << "ÅÐ¶ÏÓ¢ÐÛÊÇ·ñÓÐÎäÆ÷" << endl;
+		clock_t start2 = clock();
+		Mat weapon;
+		src(Rect(337, 534, 112, 110)).copyTo(weapon);
+		Mat weaponBG = imread("HS/weaponBG.png");
+		double rs = compareImageBySub(weapon, weaponBG);
+		/*imshow("wuqi", weapon);
+		imshow("bg", weaponBG);
 
+		waitKey(0);*/
+		cout << "ÎäÆ÷Æ¥Åä¶È£º" << rs * 100 << "%" << endl;
+		double duration2 = (double)(clock() - start2) / CLOCKS_PER_SEC;
+		cout << "ÅÐ¶ÏÊÇ·ñÓÐÎäÆ÷ÓÃÊ±:" << duration2 << "Ãë" << endl;
+		gameInfo.haveWeapon = false;
+		if (rs < 0.9)
+		{
+			cout << "Ó¢ÐÛÓÐÎäÆ÷:" << rs << endl;
+			gameInfo.haveWeapon = true;
+		}
 		/*ControlMouse *controlMouse = ControlMouse::getInstance();
 		controlMouse->moveToPosition(1000, 700);
 		Sleep(1000);*/
@@ -722,22 +762,22 @@ public:
 		Mat selfFloor;
 		src(Rect(166, 363, 680, 115)).copyTo(selfFloor);
 		recoSelfMonster(selfFloor, gameInfo);
-		cout << "ÅÐ¶ÏÓ¢ÐÛÊÇ·ñÓÐÎäÆ÷" << endl;
-		clock_t start = clock();
-		Mat weapon;
-		src(Rect(337, 534, 112, 110)).copyTo(weapon);
-		Mat weaponBG = imread("HS/weaponBG.png");
-		double rs = compareImageBySub(weapon, weaponBG);
-		/*imshow("wuqi", weapon);
-		imshow("bg", weaponBG);
-		
-		waitKey(0);*/
-		cout << "ÎäÆ÷Æ¥Åä¶È£º" << rs*100<<"%" << endl;
-		double duration = (double)(clock() - start) / CLOCKS_PER_SEC;
-		cout << "ÅÐ¶ÏÊÇ·ñÓÐÎäÆ÷ÓÃÊ±:" << duration << "Ãë" << endl;
-		if (rs < 0.9)
+		//cout << "ÅÐ¶ÏÓ¢ÐÛÊÇ·ñÓÐÎäÆ÷" << endl;
+		//clock_t start = clock();
+		//Mat weapon;
+		//src(Rect(337, 534, 112, 110)).copyTo(weapon);
+		//Mat weaponBG = imread("HS/weaponBG.png");
+		//double rs = compareImageBySub(weapon, weaponBG);
+		///*imshow("wuqi", weapon);
+		//imshow("bg", weaponBG);
+		//
+		//waitKey(0);*/
+		//cout << "ÎäÆ÷Æ¥Åä¶È£º" << rs*100<<"%" << endl;
+		//double duration = (double)(clock() - start) / CLOCKS_PER_SEC;
+		//cout << "ÅÐ¶ÏÊÇ·ñÓÐÎäÆ÷ÓÃÊ±:" << duration << "Ãë" << endl;
+		if (gameInfo.haveWeapon )//if (rs < 0.9)
 		{
-			cout << "Ó¢ÐÛÓÐÎäÆ÷:"<<rs << endl;
+			//cout << "Ó¢ÐÛÓÐÎäÆ÷:"<<rs << endl;
 			gameInfo.selfMonster[gameInfo.selfMonsterNum].x = 520;
 			gameInfo.selfMonster[gameInfo.selfMonsterNum].y = 620;
 			gameInfo.selfMonsterNum++;
@@ -800,6 +840,7 @@ public:
 		uchar b = image.at<Vec3b>(i, j)[2];
 		if (abs(r - b) > 100 || abs(g - b) > 100)
 		{
+			Sleep(3000);
 			gameInfo.state = STATE_SELFTURN_PLAY;
 			selfTurn(src, gameInfo);
 		}
@@ -936,6 +977,7 @@ public:
 		waitKey(0);*/
 		return maxi;
 	}
+	
 private:
 	const int MAXV = 1;
 	

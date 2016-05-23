@@ -120,8 +120,12 @@ public:
 					}
 					if (gameInfo.handCard[i].behavior == "下场" && gameInfo.handCard[i].spend <= gameInfo.couldUseSpend)
 					{
-						
-						cout << "ai:出牌：费用" << gameInfo.handCard[i].spend << " 可用费用：" << gameInfo.couldUseSpend << " 位置：" << gameInfo.handCard[i].x << " " << gameInfo.handCard[i].y << endl;
+						if (gameInfo.handCard[i].type == "武器")
+						{
+							if (gameInfo.haveWeapon) continue;
+							else gameInfo.haveWeapon = true;
+						}
+						cout << "ai:出牌：" << gameInfo.handCard[i].name<<" 费用" << gameInfo.handCard[i].spend << " 可用费用：" << gameInfo.couldUseSpend << " 位置：" << gameInfo.handCard[i].x << " " << gameInfo.handCard[i].y << endl;
 						controlMouse->playCard(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
 						gameInfo.couldUseSpend -= gameInfo.handCard[i].spend;
 						++havePlayNum;//已出牌数量+1，不包括幸运币
