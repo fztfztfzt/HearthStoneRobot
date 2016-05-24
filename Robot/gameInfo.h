@@ -35,7 +35,9 @@ public:
 		currentSpend = 1;
 		couldUseSpend = 1;
 		haveWeapon = false;
+		currentTimes = 0;
 	}
+	int currentTimes;
 	STATE state;
 	Card handCard[10];//手牌大小
 	Card selfMonster[10];//自己场上的随从

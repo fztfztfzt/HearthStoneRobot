@@ -204,6 +204,10 @@ public:
 		case STATE_OTHERTURN:
 			cout << "游戏阶段：对手出牌阶段" << endl;
 			break;
+		case STATE_GAMEOVE:
+			cout << "游戏结束" << endl;
+			controlMouse->touchPosition(EndTurnX, EndTurnY);//点击回合结束
+			break;
 		default:
 			break;
 		}

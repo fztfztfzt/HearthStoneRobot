@@ -20,6 +20,7 @@ class ProcessImage
 	vector<Card> allCards;
 	
 	HWND hWnd;
+	VideoWriter outputVideo;
 	static ProcessImage* self;
 	ProcessImage(){
 		numModel.resize(11);//读取数字模型
@@ -73,6 +74,7 @@ class ProcessImage
 	Mat weaponBG;
 	Mat gameOverOtherBG;
 	Mat gameOverSelfBG;
+	Mat startBG;
 public:
 	static ProcessImage* getInstance()
 	{
@@ -82,7 +84,22 @@ public:
 		}
 		return self;
 	}
-	bool gameOver()
+	void initVideo(Mat &src, GameInfo &gameInfo)
+	{
+		
+		string fname = "HS/video/" + std::to_string(gameInfo.currentTimes) + ".avi";
+		gameInfo.currentTimes++;
+		outputVideo.open(fname, CV_FOURCC('M', 'J', 'P', 'G'), 1, Size(src.cols, src.rows), true);
+	}
+	void saveVideo(Mat &src, GameInfo &gameInfo)
+	{
+		outputVideo << src;
+	}
+	void releaseVideo()
+	{
+		outputVideo.release();
+	}
+	void isGameOver(GameInfo &gameInfo)
 	{
 		Sleep(1000);
 		Mat src = getCurrentImage();
@@ -91,40 +108,71 @@ public:
 		src(Rect(455, 515, 110, 120)).copyTo(sub2);
 		double b = compareImageBySub(gameOverOtherBG, sub);
 		double b2 = compareImageBySub(gameOverSelfBG, sub2);
-		return b < 0.1 || b2<0.1;
+		if (b < 0.1 || b2 < 0.1)
+		{
+			gameInfo.state = STATE_GAMEOVE;
+			cout << "游戏结束"<< endl;
+		}
+	}
+	void gameOver(Mat& src, GameInfo& gameInfo)
+	{
+		Mat sub;
+		float f;
+		saveVideo(src, gameInfo);
+		src(Rect(790, 590, 70, 75)).copyTo(sub);
+		startBG = imread("HS/startBG.png");
+		f = compareImageBySub(startBG, sub);
+		cout << f << endl;
+		if (f > 0.9)
+		{
+			cout << "开始新的一局" << endl;
+			releaseVideo();
+			gameInfo.currentTimes += 1;
+			gameInfo.state = STATE_STARTGAME;
+		}
+	}
+	void startGame(Mat &src,GameInfo &gameInfo)
+	{
+		
 	}
 	void process(GameInfo &gameInfo)
 	{
 		Mat src = getCurrentImage();
-		bool b = gameOver();
-		cout << "游戏结束：" << b << endl;
-		if (!b)
+		isGameOver(gameInfo);
+		
+		switch (gameInfo.state)
 		{
-			switch (gameInfo.state)
-			{
-			case STATE_CHANGECARDSTART:
-				changeCardStart(src, gameInfo);
-				break;
-			case STATE_FIGHTSTART:
-				fightStart(src);
-				break;
-			case STATE_SELFTURN_PLAY:
-				selfTurn(src, gameInfo);
-				break;
-			case STATE_SELFTURN_FIGHT:
-				selfTurnFight(src, gameInfo);
-				break;
-			case STATE_OTHERTURN:
-				otherTrun(src, gameInfo);
-				break;
-			default:
-				break;
-			}
+		case STATE_STARTGAME:
+			initVideo(src, gameInfo);
+			break;
+		case STATE_CHANGECARDSTART:
+			saveVideo(src, gameInfo);
+			changeCardStart(src, gameInfo);
+			break;
+		case STATE_FIGHTSTART:
+			saveVideo(src, gameInfo);
+			fightStart(src);
+			break;
+		case STATE_SELFTURN_PLAY:
+			saveVideo(src, gameInfo);
+			selfTurn(src, gameInfo);
+			break;
+		case STATE_SELFTURN_FIGHT:
+			saveVideo(src, gameInfo);
+			selfTurnFight(src, gameInfo);
+			break;
+		case STATE_OTHERTURN:
+			saveVideo(src, gameInfo);
+			otherTrun(src, gameInfo);
+			break;
+		case STATE_GAMEOVE:
+			gameOver(src,gameInfo);
+			break;
+		default:
+			break;
 		}
-		else
-		{
-			system("pause");
-		}
+		
+	
 	}
 	void fightStart(Mat &src)
 	{
@@ -136,9 +184,11 @@ public:
 		imwrite("HS/other_floor.png", otherFloorBG);
 		src(Rect(337, 534, 112, 110)).copyTo(weaponBG);
 		imwrite("HS/weaponBG.png", weaponBG);
-		Mat sub;
 		src(Rect(460, 75, 110, 120)).copyTo(gameOverOtherBG);
+		imwrite("HS/gameOverOtherBG.png", gameOverOtherBG);
 		src(Rect(455, 515, 110, 120)).copyTo(gameOverSelfBG);
+		imwrite("HS/gameOverSelfBG.png", gameOverSelfBG);
+		
 	}
 	void changeCardStart(Mat src, GameInfo &gameInfo)//预处理发牌阶段图像
 	{
@@ -615,7 +665,7 @@ public:
 		cout << "sum:" << sum << "宽 高:" << src2.rows << " "<<src2.cols << endl;
 		/*imshow("image", image);
 		waitKey(0);*/
-		return sum>2800;
+		return sum>2500;
 	}
 	void recoOtherMonster(Mat src, GameInfo &gameInfo)
 	{
@@ -827,6 +877,7 @@ public:
 		::DeleteObject(hBitmap);
 		::DeleteObject(hMemDC);
 		::ReleaseDC(hWnd, hDC);
+		
 		return image;
 	}
 	void otherTrun(Mat src, GameInfo &gameInfo)

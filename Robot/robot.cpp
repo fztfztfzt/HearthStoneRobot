@@ -19,6 +19,7 @@ int main()
 	ProcessImage *processImage =ProcessImage::getInstance();
 	GameInfo gameInfo;
 	AI aiControl(hWnd);
+
 	while (1)
 	{
 		processImage->process(gameInfo);
