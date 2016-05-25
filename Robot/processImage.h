@@ -101,13 +101,19 @@ public:
 	}
 	void isGameOver(GameInfo &gameInfo)
 	{
+		ControlMouse *cm = ControlMouse::getInstance();
+		cm->moveToPosition(OutSideX, OutSideY);//移动到场景外，防止干扰
 		Sleep(1000);
 		Mat src = getCurrentImage();
 		Mat sub,sub2;
 		src(Rect(460, 75, 110, 120)).copyTo(sub);
 		src(Rect(455, 515, 110, 120)).copyTo(sub2);
+		/*imshow("1",sub2);
+		waitKey(0);*/
 		double b = compareImageBySub(gameOverOtherBG, sub);
 		double b2 = compareImageBySub(gameOverSelfBG, sub2);
+		cout << "b:" << b << endl;
+		cout << "b2:" << b2 << endl;
 		if (b < 0.1 || b2 < 0.1)
 		{
 			gameInfo.state = STATE_GAMEOVE;
@@ -130,6 +136,7 @@ public:
 			gameInfo.currentTimes += 1;
 			gameInfo.state = STATE_STARTGAME;
 		}
+	
 	}
 	void startGame(Mat &src,GameInfo &gameInfo)
 	{
@@ -138,7 +145,7 @@ public:
 	void process(GameInfo &gameInfo)
 	{
 		Mat src = getCurrentImage();
-		isGameOver(gameInfo);
+		
 		
 		switch (gameInfo.state)
 		{
@@ -164,6 +171,7 @@ public:
 		case STATE_OTHERTURN:
 			saveVideo(src, gameInfo);
 			otherTrun(src, gameInfo);
+			isGameOver(gameInfo);
 			break;
 		case STATE_GAMEOVE:
 			gameOver(src,gameInfo);
@@ -891,8 +899,10 @@ public:
 		uchar b = image.at<Vec3b>(i, j)[2];
 		if (abs(r - b) > 100 || abs(g - b) > 100)
 		{
-			Sleep(3000);
+			Sleep(5000);
 			gameInfo.state = STATE_SELFTURN_PLAY;
+			//process(gameInfo);
+			Mat src = getCurrentImage();
 			selfTurn(src, gameInfo);
 		}
 	}
