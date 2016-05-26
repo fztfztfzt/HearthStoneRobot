@@ -201,10 +201,13 @@ public:
 	void changeCardStart(Mat src, GameInfo &gameInfo)//预处理发牌阶段图像
 	{
 		Mat sure;
-		src(Rect(475, 595, 80, 25)).copyTo(sure);
+		src(Rect(475, 590, 80, 25)).copyTo(sure);
 		Mat sureBG = imread("HS/sure.png");
 		float ratio = compareImageBySub(sure, sureBG);
 		cout <<"有确认按钮可能性：" <<ratio*100 <<"%"<< endl;
+		/*imshow("1", sure);
+		imshow("2", sureBG);
+		waitKey(0);*/
 		if (ratio < 0.9) return;//知道有确认按钮（动画结束）时才进行下一步
 		for (int i = 0; i<src.rows; i++)//阈值处理，白色留下，其余改为黑色
 		{
@@ -572,8 +575,8 @@ public:
 			Mat temp;
 			if (r0.x + r0.width>src.cols || r0.y+r0.height>src.rows) continue;
 			src(r0).copyTo(temp);
-			/*imshow("tests", temp);
-			waitKey(0);*/
+			imshow("tests", temp);
+			waitKey(0);
 			int x = r0.x + r0.width / 2;
 			int y = r0.y + r0.height / 2;
 			x += 10 + 166;
@@ -655,7 +658,7 @@ public:
 				uchar r = src2.at<Vec3b>(i, j)[0];
 				uchar g = src2.at<Vec3b>(i, j)[1];
 				uchar b = src2.at<Vec3b>(i, j)[2];
-				if (r<200 && g<200 && b<200 && r>40 && g>40 && b>40 && abs(r - g)<15 && abs(r - b)<15 && abs(g - b)<15)
+				if (r<200 && g<200 && b<200 && r>40 && g>40 && b>40 && abs(r - g)<25 && abs(r - b)<25 && abs(g - b)<25)
 				{
 					sum++;
 					image.at<Vec3b>(i, j)[0] = 255;
@@ -792,7 +795,7 @@ public:
 		imshow("bg", weaponBG);
 
 		waitKey(0);*/
-		cout << "武器匹配度：" << rs * 100 << "%" << endl;
+		cout << "武器匹配度：" << (1-rs) * 100 << "%" << endl;
 		double duration2 = (double)(clock() - start2) / CLOCKS_PER_SEC;
 		cout << "判断是否有武器用时:" << duration2 << "秒" << endl;
 		gameInfo.haveWeapon = false;

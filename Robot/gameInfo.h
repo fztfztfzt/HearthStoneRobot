@@ -31,7 +31,7 @@ class GameInfo
 public:
 	GameInfo()
 	{
-		state = STATE_STARTGAME;
+		state = STATE_SELFTURN_FIGHT;
 		currentSpend = 1;
 		couldUseSpend = 1;
 		haveWeapon = false;
