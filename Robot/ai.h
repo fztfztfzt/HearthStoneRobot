@@ -179,9 +179,14 @@ public:
 					{
 						flag = true;
 						controlMouse->fightMonster(gameInfo.selfMonster[i].x, gameInfo.selfMonster[i].y, gameInfo.otherMonster[j].x, gameInfo.otherMonster[j].y);
-						cout << gameInfo.selfMonster[i].name << "攻击，对象位置：" << gameInfo.otherMonster[j].x<<gameInfo.otherMonster[j].y << endl;
-						cout << "重新扫描场上随从" << endl;
-						return;
+						cout << "我方(" << gameInfo.selfMonster[i].name << "attack:" << gameInfo.selfMonster[i].attack << "life:" << gameInfo.selfMonster[i].life << ")进行攻击 :" << gameInfo.otherMonster[j].attack << "位置：" << gameInfo.otherMonster[j].x << gameInfo.otherMonster[j].y << endl;
+						if (gameInfo.selfMonster[i].life < gameInfo.otherMonster[j].attack)
+						{
+							cout << "我方进攻随从死亡，重新扫描场上随从" << endl;
+							return;
+						}
+						
+						
 					}
 				}
 				if (!flag)

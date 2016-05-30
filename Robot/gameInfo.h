@@ -36,6 +36,8 @@ public:
 		couldUseSpend = 1;
 		haveWeapon = false;
 		currentTimes = 0;
+		selfMonsterNum = 0;
+		otherMonsterNum = 0;
 	}
 	int currentTimes;
 	STATE state;

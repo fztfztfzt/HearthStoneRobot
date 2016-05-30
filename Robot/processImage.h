@@ -11,9 +11,13 @@
 #include "ControlMouse.h"
 using namespace cv;
 using namespace std;
-int num[11][9] = { { 0, 1, 1, 1, 0, 1, 1, 1, 1 }, { 0, 1, 1, 0, 1, 1, 0, 1, 1 }, { 1, 0, 1, 1, 0, 1, 0, 1, 0 }, { 0, 1, 0, 0, 1, 1, 0, 0, 1 },
-{ 0, 0, 1, 0, 0, 1, 0, 1, 1 }, { 1, 1, 1, 1, 1, 1, 1, 1, 1 }, { 0, 0, 0, 1, 0, 1, 1, 1, 1 }, { 1, 1, 1, 0, 1, 0, 0, 1, 0 },
-{ 0, 0, 1, 0, 1, 1, 1, 0, 0 }, { 1, 1, 1, 1, 0, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 1, 1, 1, 0 } };
+//int num[11][9] = { { 0, 1, 1, 1, 0, 1, 1, 1, 1 }, { 0, 1, 1, 0, 1, 1, 0, 1, 1 }, { 1, 0, 1, 1, 0, 1, 0, 1, 0 }, { 0, 1, 0, 0, 1, 1, 0, 0, 1 },
+//{ 0, 0, 1, 0, 0, 1, 0, 1, 1 }, { 1, 1, 1, 1, 1, 1, 1, 1, 1 }, { 0, 0, 0, 1, 0, 1, 1, 1, 1 }, { 1, 1, 1, 0, 1, 0, 0, 1, 0 },
+//{ 0, 0, 1, 0, 1, 1, 1, 0, 0 }, { 1, 1, 1, 1, 0, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 1, 1, 1, 0 } };
+bool contoursCmp(std::vector<Point> a, std::vector<Point> b)
+{
+	return a[0].x < b[0].x;
+}
 vector<vector<vector<bool>>> numModel;
 class ProcessImage
 {
@@ -208,7 +212,7 @@ public:
 		/*imshow("1", sure);
 		imshow("2", sureBG);
 		waitKey(0);*/
-		if (ratio < 0.9) return;//知道有确认按钮（动画结束）时才进行下一步
+		if (ratio < 0.5) return;//知道有确认按钮（动画结束）时才进行下一步
 		for (int i = 0; i<src.rows; i++)//阈值处理，白色留下，其余改为黑色
 		{
 			for (int j = 0; j<src.cols; j++)
@@ -371,10 +375,11 @@ public:
 					}
 				}
 			}
-			//cout << num << " ";
+			
 			if (num>w*h / 2) temp[i] = 1, cout << "1" << ",";
 			else cout << "0" << ",";
 			//if (i % 3 == 2) cout << endl;
+			//cout << num << " "<<endl;
 		}
 		int maxsum = 0, maxn = 0;
 		for (int i = 0; i < 11; ++i)
@@ -575,8 +580,8 @@ public:
 			Mat temp;
 			if (r0.x + r0.width>src.cols || r0.y+r0.height>src.rows) continue;
 			src(r0).copyTo(temp);
-			imshow("tests", temp);
-			waitKey(0);
+			/*imshow("tests", temp);
+			waitKey(0);*/
 			int x = r0.x + r0.width / 2;
 			int y = r0.y + r0.height / 2;
 			x += 10 + 166;
@@ -595,7 +600,16 @@ public:
 			gameInfo.selfMonster[gameInfo.selfMonsterNum] = allCards[cardID];
 			gameInfo.selfMonster[gameInfo.selfMonsterNum].x = x;
 			gameInfo.selfMonster[gameInfo.selfMonsterNum].y = y;
-			cout << "出牌阶段：识别己方场上随从：个数：" << gameInfo.selfMonsterNum + 1 << " 名称：" << gameInfo.selfMonster[gameInfo.selfMonsterNum].name << " 费用：" << gameInfo.selfMonster[gameInfo.selfMonsterNum].spend << " 位置:" << gameInfo.selfMonster[gameInfo.selfMonsterNum].x << " " << gameInfo.selfMonster[gameInfo.selfMonsterNum].y << endl;
+
+			//识别数值
+			Mat attackImage;
+			temp(Rect(0, 0, temp.cols / 2, temp.rows)).copyTo(attackImage);//读取左侧数字
+			gameInfo.otherMonster[gameInfo.selfMonsterNum].attack = recoImageNum(attackImage);
+			Mat lifeImage;
+			temp(Rect(temp.cols / 2, 0, temp.cols / 2, temp.rows)).copyTo(lifeImage);//读取左侧数字
+			gameInfo.otherMonster[gameInfo.selfMonsterNum].life = recoImageNum(lifeImage);
+
+			cout << "出牌阶段：识别己方场上随从：个数：" << gameInfo.selfMonsterNum + 1 << " 名称：" << gameInfo.selfMonster[gameInfo.selfMonsterNum].name << " 攻击：" << gameInfo.otherMonster[gameInfo.selfMonsterNum].attack << " 生命：" << gameInfo.otherMonster[gameInfo.selfMonsterNum].life << " 费用：" << gameInfo.selfMonster[gameInfo.selfMonsterNum].spend << " 位置:" << gameInfo.selfMonster[gameInfo.selfMonsterNum].x << " " << gameInfo.selfMonster[gameInfo.selfMonsterNum].y << endl;
 			gameInfo.selfMonsterNum++;
 		}
 
@@ -678,6 +692,75 @@ public:
 		waitKey(0);*/
 		return sum>2500;
 	}
+	
+	int recoImageNum(Mat src)
+	{
+		imshow("b", src);
+		for (int i = 0; i<src.rows; i++)//阈值处理，白色留下，其余改为黑色
+		{
+			for (int j = 0; j<src.cols; j++)
+			{
+				uchar b = src.at<Vec3b>(i, j)[0];
+				uchar g = src.at<Vec3b>(i, j)[1];
+				uchar r = src.at<Vec3b>(i, j)[2];
+				//cout << (int)r << " " << (int)g << " " << (int)b << endl;
+				if ((r == 255 && g == 255 && b == 247) || (r == 0 && g == 255 && b == 0) || (r >=240 && g == 0 && b == 0))
+				{
+					src.at<Vec3b>(i, j)[0] = 255;
+					src.at<Vec3b>(i, j)[1] = 255;
+					src.at<Vec3b>(i, j)[2] = 255;
+				}
+				else
+				{
+					src.at<Vec3b>(i, j)[0] = 0;
+					src.at<Vec3b>(i, j)[1] = 0;
+					src.at<Vec3b>(i, j)[2] = 0;
+				}
+			}
+		}
+		Mat gray;
+		cvtColor(src, gray, CV_BGR2GRAY);//转换为单通道便于进行轮廓提取
+		imshow("a", gray);
+		waitKey(0);
+		vector<std::vector<Point>> contours;
+		findContours(gray,			//图像
+			contours,				//轮廓点
+			//包含图像拓扑结构的信息（可选参数，这里没有选）
+			CV_RETR_EXTERNAL,			//获取轮廓的方法（这里获取外围轮廓）
+			CV_CHAIN_APPROX_NONE);		//轮廓近似的方法（这里不近似，获取全部轮廓）
+		//打印轮廓信息
+		std::cout << "识别图像数值：共有外围轮廓：" << contours.size() << "条" << std::endl;
+		std::vector<std::vector<Point>>::const_iterator itContours = contours.begin();
+		for (; itContours != contours.end(); ++itContours)
+		{
+			std::cout << "每个轮廓的长度: " << itContours->size() << std::endl;
+		}
+
+
+
+
+		/*Mat result(gray.size(), CV_8U, Scalar(255));
+		result.setTo(Scalar(255));
+		drawContours(result, contours, -1, Scalar(0), 2);*/
+		//imshow("提取外围轮廓", result);
+
+		Mat matio;
+		int num = contours.size();
+		int sum = 0;
+		sort(contours.begin(), contours.begin() + contours.size(), contoursCmp);
+		for (int i = 0; i < contours.size(); ++i)
+		{
+			Rect r0 = boundingRect(Mat(contours[i]));
+			if (r0.width >= r0.height) continue;
+			src(r0).copyTo(matio);
+			rectangle(src, r0, Scalar(255), 2);
+			//imshow("", matio);
+			
+			sum = sum*10+recoNum(matio);
+			//waitKey(0);
+		}
+		return sum;
+	}
 	void recoOtherMonster(Mat src, GameInfo &gameInfo)
 	{
 		Mat floor = imread("HS/other_floor.png", 0);
@@ -723,11 +806,22 @@ public:
 			x += 204;
 			y +=  229+40;
 			
-		
+			imshow("1",temp);
+			waitKey(0);
 			gameInfo.otherMonster[gameInfo.otherMonsterNum].taugh = isTaunt(temp);
 			gameInfo.otherMonster[gameInfo.otherMonsterNum].x = x;
 			gameInfo.otherMonster[gameInfo.otherMonsterNum].y = y;
-			cout << "出牌阶段：对方场上卡牌信息：是否嘲讽：" << gameInfo.otherMonster[gameInfo.otherMonsterNum].taugh << " 位置:" << gameInfo.otherMonster[gameInfo.otherMonsterNum].x << " " << gameInfo.otherMonster[gameInfo.otherMonsterNum].y << endl;
+
+			//识别数值
+			Mat attackImage;
+			temp(Rect(0, 0, temp.cols / 2, temp.rows)).copyTo(attackImage);//读取左侧数字
+			
+			gameInfo.otherMonster[gameInfo.otherMonsterNum].attack = recoImageNum(attackImage);
+			Mat lifeImage;
+			temp(Rect(temp.cols / 2, 0, temp.cols/2, temp.rows)).copyTo(lifeImage);//读取左侧数字
+			gameInfo.otherMonster[gameInfo.otherMonsterNum].life = recoImageNum(lifeImage);
+
+			cout << "出牌阶段：对方场上卡牌信息：是否嘲讽：" << gameInfo.otherMonster[gameInfo.otherMonsterNum].taugh << " 攻击：" << gameInfo.otherMonster[gameInfo.otherMonsterNum].attack << " 生命：" << gameInfo.otherMonster[gameInfo.otherMonsterNum].life<< " 位置:" << gameInfo.otherMonster[gameInfo.otherMonsterNum].x << " " << gameInfo.otherMonster[gameInfo.otherMonsterNum].y << endl;
 			gameInfo.otherMonsterNum++;
 			/*imshow("sub",sub);
 			waitKey(0);*/
