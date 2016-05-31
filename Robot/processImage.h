@@ -26,6 +26,7 @@ class ProcessImage
 	HWND hWnd;
 	VideoWriter outputVideo;
 	static ProcessImage* self;
+	int gameOverNum = 0;
 	ProcessImage(){
 		numModel.resize(11);//读取数字模型
 		ifstream f;
@@ -112,16 +113,27 @@ public:
 		Mat sub,sub2;
 		src(Rect(460, 75, 110, 120)).copyTo(sub);
 		src(Rect(455, 515, 110, 120)).copyTo(sub2);
-		/*imshow("1",sub2);
-		waitKey(0);*/
+		
 		double b = compareImageBySub(gameOverOtherBG, sub);
 		double b2 = compareImageBySub(gameOverSelfBG, sub2);
 		cout << "b:" << b << endl;
 		cout << "b2:" << b2 << endl;
 		if (b < 0.1 || b2 < 0.1)
 		{
+			++gameOverNum;
+			Sleep(1000);
+		}
+		else 
+		{
+			gameOverNum = 0;
+		}
+		if (gameOverNum>3)
+		{
 			gameInfo.state = STATE_GAMEOVE;
-			cout << "游戏结束"<< endl;
+			cout << "游戏结束" << endl;
+			/*imshow("1", sub2);
+			imshow("2", sub);
+			waitKey(0);*/
 		}
 	}
 	void gameOver(Mat& src, GameInfo& gameInfo)
@@ -695,7 +707,7 @@ public:
 	
 	int recoImageNum(Mat src)
 	{
-		imshow("b", src);
+		//imshow("b", src);
 		for (int i = 0; i<src.rows; i++)//阈值处理，白色留下，其余改为黑色
 		{
 			for (int j = 0; j<src.cols; j++)
@@ -704,7 +716,7 @@ public:
 				uchar g = src.at<Vec3b>(i, j)[1];
 				uchar r = src.at<Vec3b>(i, j)[2];
 				//cout << (int)r << " " << (int)g << " " << (int)b << endl;
-				if ((r == 255 && g == 255 && b == 247) || (r == 0 && g == 255 && b == 0) || (r >=240 && g == 0 && b == 0))
+				if ((r == 255 && g == 255 && b == 255) || (r == 0 && g == 255 && b == 0) || (r ==255 && g == 0 && b == 0))
 				{
 					src.at<Vec3b>(i, j)[0] = 255;
 					src.at<Vec3b>(i, j)[1] = 255;
@@ -720,8 +732,8 @@ public:
 		}
 		Mat gray;
 		cvtColor(src, gray, CV_BGR2GRAY);//转换为单通道便于进行轮廓提取
-		imshow("a", gray);
-		waitKey(0);
+		//imshow("a", gray);
+		//waitKey(0);
 		vector<std::vector<Point>> contours;
 		findContours(gray,			//图像
 			contours,				//轮廓点
@@ -806,8 +818,8 @@ public:
 			x += 204;
 			y +=  229+40;
 			
-			imshow("1",temp);
-			waitKey(0);
+			//imshow("1",temp);
+			//waitKey(0);
 			gameInfo.otherMonster[gameInfo.otherMonsterNum].taugh = isTaunt(temp);
 			gameInfo.otherMonster[gameInfo.otherMonsterNum].x = x;
 			gameInfo.otherMonster[gameInfo.otherMonsterNum].y = y;
