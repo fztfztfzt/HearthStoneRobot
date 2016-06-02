@@ -716,7 +716,7 @@ public:
 				uchar g = src.at<Vec3b>(i, j)[1];
 				uchar r = src.at<Vec3b>(i, j)[2];
 				//cout << (int)r << " " << (int)g << " " << (int)b << endl;
-				if ((r == 255 && g == 255 && b == 255) || (r == 0 && g == 255 && b == 0) || (r ==255 && g == 0 && b == 0))
+				if ((r >= 230 && g >= 230 && b >= 230) || (r == 0 && g == 255 && b == 0) || (r == 255 && g == 0 && b == 0))
 				{
 					src.at<Vec3b>(i, j)[0] = 255;
 					src.at<Vec3b>(i, j)[1] = 255;
@@ -747,15 +747,26 @@ public:
 		{
 			std::cout << "每个轮廓的长度: " << itContours->size() << std::endl;
 		}
+		//除去太长或者太短的轮廓
+		int cmin = 30;
+		int cmax = 100;
+		std::vector<std::vector<Point>>::const_iterator itc = contours.begin();
+		while (itc != contours.end())
+		{
+			cout << "手牌数字部分轮廓大小：" << itc->size() << endl;
+			if (itc->size() < cmin || itc->size() > cmax)
+				itc = contours.erase(itc);
+			else
+				++itc;
+		}
 
 
 
-
-		/*Mat result(gray.size(), CV_8U, Scalar(255));
+		Mat result(gray.size(), CV_8U, Scalar(255));
 		result.setTo(Scalar(255));
-		drawContours(result, contours, -1, Scalar(0), 2);*/
-		//imshow("提取外围轮廓", result);
-
+		drawContours(result, contours, -1, Scalar(0), 2);
+	//	imshow("提取外围轮廓", result);
+	//	waitKey(0);
 		Mat matio;
 		int num = contours.size();
 		int sum = 0;
