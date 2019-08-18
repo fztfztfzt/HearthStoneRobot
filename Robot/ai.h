@@ -1,5 +1,4 @@
 #pragma once
-#include <Windows.h>
 #include "gameInfo.h"
 #include "ControlMouse.h"
 #include "define.h"
@@ -19,12 +18,19 @@ public:
 	}
 	void startGame(GameInfo &gameInfo)
 	{
-		cout << "游戏阶段：开始新的一轮练习模式,选择术士，点击开始按钮，延时1秒" << endl;
+		cout << "游戏阶段：开始新的一轮练习模式,选择法师，点击开始按钮，延时1秒" << endl;
+
 		//练习模式：
-		controlMouse->touchPosition(835,655);//点击选择按钮
-		controlMouse->touchPosition(845, 495);//选择术士
-		controlMouse->touchPosition(850, 645);//点击开始按钮
+		Sleep(1000);
+		controlMouse->touchPosition(810, 350); // 点击冒险模式
 		Sleep(1000);//延时1s
+		controlMouse->touchPosition(1149, 223); // 点击Normal模式
+		controlMouse->touchPosition(1164,771);//点击选择按钮
+		controlMouse->touchPosition(594, 632);//选择法师
+		controlMouse->touchPosition(1164, 760);//点击Play按钮
+		controlMouse->touchPosition(1187, 193); // 选择猎人
+		controlMouse->touchPosition(1164, 760); //点击Play按钮
+		Sleep(6000);//延时6s
 		gameInfo.state = STATE_CHANGECARDSTART;
 	}
 	void changeCardStart(GameInfo &gameInfo)
@@ -44,18 +50,21 @@ public:
 			cout << "换牌个数识别错误" << endl;
 			return;//识别错误
 		}
-		string NoChangeCard[4] = { "狼人渗透者", "麻疯侏儒", "疯狂的科学家", "鬼灵爬行者" };
+		std::vector<string> NoChangeCards = { "淡水鳄", "鱼人袭击者", "血沼迅猛龙", "工程师学徒", "森金持盾卫士", "冰风雪人"};
+
 		for (int i = 0; i < gameInfo.currentNum; ++i)
 		{
-			int flag = false;
-			for (int j = 0; j < 4; ++j)
+			int bShouldChange = true;
+			
+			for (auto noChangeCard : NoChangeCards)
 			{
-				if (gameInfo.handCard[i].name == NoChangeCard[j])
+				if (gameInfo.handCard[i].name == noChangeCard)
 				{
-					flag = true;
+					bShouldChange = false;
+					break;
 				}
 			}
-			if (!flag)
+			if (bShouldChange)
 			{
 				cout << "更换卡牌：" << gameInfo.handCard[i].name << endl;
 				controlMouse->touchPosition(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
@@ -77,7 +86,7 @@ public:
 		case STATE_CHANGECARDEND:
 			cout << "游戏阶段：换牌阶段结束，点击确定按钮" << endl;
 			//确定
-			controlMouse->touchPosition(500, 600);
+			controlMouse->touchPosition((confirmButton.x + confirmButton.width/2), (confirmButton.y + confirmButton.height/2));
 			gameInfo.state = STATE_FIGHTSTART;
 			if(gameInfo.first) Sleep(15000);//等待发牌结束
 			else Sleep(10000);
@@ -133,9 +142,6 @@ public:
 						return;//重新扫描，确认手牌位置
 						
 					}
-				
-					
-					
 				}
 
 				for (int i = 0; i < gameInfo.currentNum; ++i)

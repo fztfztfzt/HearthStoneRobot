@@ -15,11 +15,12 @@ int main()
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	SMALL_RECT rc = { 1400, 0, 120, 30 };
 	SetConsoleWindowInfo(hOut, true, &rc);
-	HWND hWnd = ::FindWindow("UnityWndClass", ("Â¯Ê¯´«Ëµ"));
-	ProcessImage *processImage =ProcessImage::getInstance();
+	HWND hWnd = ::FindWindow("UnityWndClass", CARDGAME);
+	ProcessImage *processImage = ProcessImage::getInstance();
 	GameInfo gameInfo;
 	AI aiControl(hWnd);
-
+	aiControl.startGame(gameInfo);
+	gameInfo.state = STATE_SELFTURN_FIGHT;
 	while (1)
 	{
 		processImage->process(gameInfo);

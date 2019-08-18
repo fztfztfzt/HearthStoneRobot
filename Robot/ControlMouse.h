@@ -63,15 +63,21 @@ private:
 	static ControlMouse* self;
 	ControlMouse()
 	{
-		hWnd = ::FindWindow("UnityWndClass", ("Â¯Ê¯´«Ëµ"));
+		hWnd = ::FindWindow("UnityWndClass", CARDGAME);
 		screenWidth = GetSystemMetrics(SM_CXSCREEN);
 		screenHeight = GetSystemMetrics(SM_CYSCREEN);
 		SetForegroundWindow(hWnd);
 		//::SetActiveWindow(hWnd);
 		RECT rc;
 		::GetWindowRect(hWnd, &rc);
-
+		RECT rcClient;
+		::GetClientRect(hWnd, &rcClient);
+		POINT wnd;
+		wnd.x = rcClient.left;
+		wnd.y = rcClient.top;
+		::ClientToScreen(hWnd, &wnd);
 		::MoveWindow(hWnd, 0, 0, rc.right - rc.left, rc.bottom - rc.top, true);
+		::GetWindowRect(hWnd, &rc);
 	}
 };
 ControlMouse *ControlMouse::self = NULL;

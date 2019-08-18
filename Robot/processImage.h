@@ -4,13 +4,18 @@
 #pragma once
 #include <iostream>
 #include <fstream>
-#include <opencv2\opencv.hpp>
 #include <time.h>
-#include "opencv2/legacy/legacy.hpp"    //BruteForceMatcher实际在该头文件中  
+#include <opencv2\opencv.hpp>
+#include "opencv2/imgproc/types_c.h"
+#include "opencv2/videoio/legacy/constants_c.h"    //BruteForceMatcher实际在该头文件中  
+#include "opencv2/core/base.hpp"
 #include "gameInfo.h"
 #include "ControlMouse.h"
 using namespace cv;
 using namespace std;
+
+
+
 //int num[11][9] = { { 0, 1, 1, 1, 0, 1, 1, 1, 1 }, { 0, 1, 1, 0, 1, 1, 0, 1, 1 }, { 1, 0, 1, 1, 0, 1, 0, 1, 0 }, { 0, 1, 0, 0, 1, 1, 0, 0, 1 },
 //{ 0, 0, 1, 0, 0, 1, 0, 1, 1 }, { 1, 1, 1, 1, 1, 1, 1, 1, 1 }, { 0, 0, 0, 1, 0, 1, 1, 1, 1 }, { 1, 1, 1, 0, 1, 0, 0, 1, 0 },
 //{ 0, 0, 1, 0, 1, 1, 1, 0, 0 }, { 1, 1, 1, 1, 0, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 1, 1, 1, 0 } };
@@ -53,8 +58,7 @@ class ProcessImage
 			numModel[i] = v;
 		}
 		f.close();
-
-		f.open("cardInfo.txt", ios::in);//获取卡组信息
+		f.open(CARDSDESCRPIT, ios::in);//获取卡组信息
 		while (!f.eof())
 		{
 			Card temp;
@@ -71,7 +75,7 @@ class ProcessImage
 		}
 		f.close();
 
-		hWnd = ::FindWindow("UnityWndClass", ("炉石传说"));
+		hWnd = ::FindWindow("UnityWndClass", CARDGAME);
 	}
 
 	Mat selfFloorBG;
@@ -141,7 +145,7 @@ public:
 		Mat sub;
 		float f;
 		saveVideo(src, gameInfo);
-		src(Rect(790, 590, 70, 75)).copyTo(sub);
+		src(confirmButton).copyTo(sub);
 		startBG = imread("HS/startBG.png");
 		f = compareImageBySub(startBG, sub);
 		cout << f << endl;
@@ -161,7 +165,6 @@ public:
 	void process(GameInfo &gameInfo)
 	{
 		Mat src = getCurrentImage();
-		
 		
 		switch (gameInfo.state)
 		{
@@ -217,7 +220,7 @@ public:
 	void changeCardStart(Mat src, GameInfo &gameInfo)//预处理发牌阶段图像
 	{
 		Mat sure;
-		src(Rect(475, 590, 80, 25)).copyTo(sure);
+		src(confirmButton).copyTo(sure);
 		Mat sureBG = imread("HS/sure.png");
 		float ratio = compareImageBySub(sure, sureBG);
 		cout <<"有确认按钮可能性：" <<ratio*100 <<"%"<< endl;
@@ -268,9 +271,6 @@ public:
 			std::cout << "每个轮廓的长度: " << itContours->size() << std::endl;
 		}*/
 
-
-
-
 		Mat result(thr.size(), CV_8U, Scalar(255));
 		result.setTo(Scalar(255));
 		drawContours(result, contours, -1, Scalar(0), 2);
@@ -316,8 +316,6 @@ public:
 			gameInfo.handCard[i].x = r0.x + r0.width / 2;
 			gameInfo.handCard[i].y = r0.y + r0.height / 2;
 			cout << "换牌阶段：识别出的卡牌信息：名称：" << gameInfo.handCard[i].name << " 费用：" << gameInfo.handCard[i].spend << " 位置:" << gameInfo.handCard[i].x << " " << gameInfo.handCard[i].y << endl;
-
-
 		}
 	//	imshow("外接矩形", src);
 	}
@@ -421,7 +419,7 @@ public:
 		//识别手牌
 		clock_t startT = clock();
 		Mat image, src2;
-		src(Rect(260, 660, 440, src.rows - 660)).copyTo(src2);
+		src(Rect(484, 778, 554, src.rows - 778)).copyTo(src2);
 		src2.copyTo(image);
 		for (int i = 0; i<src2.rows; i++)//阈值处理，白色留下，其余改为黑色
 		{
@@ -470,13 +468,11 @@ public:
 		std::cout << "每个轮廓的长度: " << itContours->size() << std::endl;
 		}*/
 
-
-
-
-		/*	Mat result(gray.size(), CV_8U, Scalar(255));
+		Mat result(gray.size(), CV_8U, Scalar(255));
 		result.setTo(Scalar(255));
 		drawContours(result, contours, -1, Scalar(0), 2);
-		imshow("提取外围轮廓", result);*/
+		//imshow("提取外围轮廓", result);
+		//waitKey(0);
 
 		//除去太长或者太短的轮廓
 		int cmin = 30;
@@ -512,11 +508,13 @@ public:
 			/*imshow("iiiiiiiii", matio);
 			waitKey(0);*/
 			//gameInfo.handCard[gameInfo.currentNum].spend = getNumByImage(matio[i]);
-			int x = 260 + r0.x + r0.width / 2 + 10;
-			int y = 660 + r0.y + r0.height / 2 + 30;
+			int x = 484 + r0.x + r0.width / 2 + 10;
+			int y = 778 + r0.y + r0.height / 2 + 30;
 			ControlMouse *con = ControlMouse::getInstance();
 			con->moveToPosition(x, y);
-			Rect r1(x - 100 - 10, y - 320 - 30, 250, 350);
+			int thisCardWidth = 250;
+			int thisCardHeight = std::min(350, HearthWindowHeight - y + 320 + 30);
+			Rect r1(x - 100 - 10, y - 320 - 30, thisCardWidth, thisCardHeight);
 
 			//cout << gameInfo.handCard[gameInfo.currentNum].x << " " << gameInfo.handCard[gameInfo.currentNum].y << endl;
 			//cout << r1.x << " " << r1.y << " " << r1.width << " " << r1.height << endl;
@@ -537,7 +535,6 @@ public:
 			gameInfo.handCard[gameInfo.currentNum].y = y;
 			cout << "出牌阶段：识别出的卡牌信息：名称：" << gameInfo.handCard[gameInfo.currentNum].name << " 费用：" << gameInfo.handCard[gameInfo.currentNum].spend << " 位置:" << gameInfo.handCard[gameInfo.currentNum].x << " " << gameInfo.handCard[gameInfo.currentNum].y << endl;
 			gameInfo.currentNum++;
-
 		}
 		//imshow("外接矩形", src);
 
@@ -557,12 +554,12 @@ public:
 		Mat gray,floor_gray;
 		cvtColor(src, gray, CV_BGR2GRAY);
 		cvtColor(floor, floor_gray, CV_BGR2GRAY);
-		//imshow("yuan", src);
+		imshow("yuan", src);
 		//imshow("floor", floor);
 		subtract(floor_gray, gray, out);
 		cout << "当前场面减去场面背景成功！" << endl;
 		//imshow("test", out);
-		//waitKey(0);
+		waitKey(0);
 		Mat thr;
 		threshold(out, thr, 40, 255, CV_THRESH_BINARY);
 		Mat element = getStructuringElement(MORPH_RECT, Size(3, 3));//腐蚀膨胀效果不好
@@ -598,7 +595,6 @@ public:
 			int y = r0.y + r0.height / 2;
 			x += 10 + 166;
 			y += 30 + 363;
-
 
 			ControlMouse *cm = ControlMouse::getInstance();
 			cm->moveToPosition(x, y);
@@ -669,7 +665,6 @@ public:
 		//	}
 		//}
 		cout << "识别自己场上随从结束！" << endl;
-		
 	}
 	bool isTaunt(Mat src)
 	{
@@ -759,8 +754,6 @@ public:
 			else
 				++itc;
 		}
-
-
 
 		Mat result(gray.size(), CV_8U, Scalar(255));
 		result.setTo(Scalar(255));
@@ -878,7 +871,7 @@ public:
 		//		/*ControlMouse *cm = ControlMouse::getInstance();
 		//		cm->moveToPosition(x, y);
 		//		Sleep(1000);
-		//		HWND hWnd = ::FindWindow("UnityWndClass", ("炉石传说"));
+		//		HWND hWnd = ::FindWindow("UnityWndClass", CARDGAME);
 		//		Mat image = getCurrentImage(hWnd);
 		//		Mat sub;
 		//		image(Rect(x, y, 102, 126)).copyTo(sub);
@@ -938,7 +931,7 @@ public:
 	{
 		cout << "识别已方场上随从" << endl;
 		Mat selfFloor;
-		src(Rect(166, 363, 680, 115)).copyTo(selfFloor);
+		src(Rect(342, 273, 883, 288)).copyTo(selfFloor);
 		recoSelfMonster(selfFloor, gameInfo);
 		//cout << "判断英雄是否有武器" << endl;
 		//clock_t start = clock();
@@ -966,45 +959,202 @@ public:
 		recoOtherMonster(otherFloor, gameInfo);
 		Sleep(1000);
 	}
+	char* CaptureAnImage(HWND hWnd)
+	{
+		char *lpbitmap = NULL;
+		HDC hdcScreen;
+		HDC hdcWindow;
+		HDC hdcMemDC = NULL;
+		HBITMAP hbmScreen = NULL;
+		BITMAP bmpScreen;
+
+		// Retrieve the handle to a display device context for the client 
+		// area of the window. 
+		hdcScreen = GetDC(NULL);
+		hdcWindow = GetDC(hWnd);
+
+		// Create a compatible DC which is used in a BitBlt from the window DC
+		hdcMemDC = CreateCompatibleDC(hdcWindow);
+
+		if (!hdcMemDC)
+		{
+			goto done;
+		}
+
+		// Get the client area for size calculation
+		RECT rcClient;
+		GetClientRect(hWnd, &rcClient);
+		POINT rcClientTopLeft;
+		rcClientTopLeft.x = rcClient.left;
+		rcClientTopLeft.y = rcClient.top;
+		POINT rcClientBottomRight;
+		rcClientBottomRight.x = rcClient.right;
+		rcClientBottomRight.y = rcClient.bottom;
+		RECT rcWnd;
+		ClientToScreen(hWnd, &rcClientTopLeft);
+		ClientToScreen(hWnd, &rcClientBottomRight);
+		GetWindowRect(hWnd, &rcWnd);
+		rcWnd.left = rcClientTopLeft.x;
+		rcWnd.top = rcClientTopLeft.y;
+		rcWnd.right = rcClientBottomRight.x;
+		rcWnd.bottom = rcClientBottomRight.y;
+
+		//This is the best stretch mode
+		SetStretchBltMode(hdcWindow, HALFTONE);
+		/*GetSystemMetrics(SM_CXSCREEN),
+		GetSystemMetrics(SM_CYSCREEN),*/
+
+		//The source DC is the entire screen and the destination DC is the current window (HWND)
+		if (!StretchBlt(hdcWindow,
+			0, 0,
+			rcClient.right, rcClient.bottom,
+			hdcScreen,
+			rcWnd.left, rcWnd.top,
+			rcWnd.right - rcWnd.left, rcWnd.bottom - rcWnd.top,
+			SRCCOPY))
+		{
+			goto done;
+		}
+
+		// Create a compatible bitmap from the Window DC
+		hbmScreen = CreateCompatibleBitmap(hdcWindow, rcClient.right - rcClient.left, rcClient.bottom - rcClient.top);
+
+		if (!hbmScreen)
+		{
+			goto done;
+		}
+
+		// Select the compatible bitmap into the compatible memory DC.
+		SelectObject(hdcMemDC, hbmScreen);
+
+		// Bit block transfer into our compatible memory DC.
+		if (!BitBlt(hdcMemDC,
+			0, 0,
+			rcClient.right - rcClient.left, rcClient.bottom - rcClient.top,
+			hdcWindow,
+			0, 0,
+			SRCCOPY))
+		{
+			goto done;
+		}
+
+		// Get the BITMAP from the HBITMAP
+		GetObject(hbmScreen, sizeof(BITMAP), &bmpScreen);
+
+		BITMAPFILEHEADER   bmfHeader;
+		BITMAPINFOHEADER   bi;
+
+		bi.biSize = sizeof(BITMAPINFOHEADER);
+		bi.biWidth = bmpScreen.bmWidth;
+		bi.biHeight = bmpScreen.bmHeight;
+		bi.biPlanes = 1;
+		bi.biBitCount = 32;
+		bi.biCompression = BI_RGB;
+		bi.biSizeImage = 0;
+		bi.biXPelsPerMeter = 0;
+		bi.biYPelsPerMeter = 0;
+		bi.biClrUsed = 0;
+		bi.biClrImportant = 0;
+
+		DWORD dwBmpSize = ((bmpScreen.bmWidth * bi.biBitCount + 31) / 32) * 4 * bmpScreen.bmHeight;
+
+		// Starting with 32-bit Windows, GlobalAlloc and LocalAlloc are implemented as wrapper functions that 
+		// call HeapAlloc using a handle to the process's default heap. Therefore, GlobalAlloc and LocalAlloc 
+		// have greater overhead than HeapAlloc.
+		HANDLE hDIB = GlobalAlloc(GHND, dwBmpSize);
+		lpbitmap = (char *)GlobalLock(hDIB);
+
+		// Gets the "bits" from the bitmap and copies them into a buffer 
+		// which is pointed to by lpbitmap.
+		GetDIBits(hdcWindow, hbmScreen, 0,
+			(UINT)bmpScreen.bmHeight,
+			lpbitmap,
+			(BITMAPINFO *)&bi, DIB_RGB_COLORS);
+
+		// A file is created, this is where we will save the screen capture.
+		HANDLE hFile = CreateFile("captureqwsx.bmp",
+			GENERIC_WRITE,
+			0,
+			NULL,
+			CREATE_ALWAYS,
+			FILE_ATTRIBUTE_NORMAL, NULL);
+
+		// Add the size of the headers to the size of the bitmap to get the total file size
+		DWORD dwSizeofDIB = dwBmpSize + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+
+		//Offset to where the actual bitmap bits start.
+		bmfHeader.bfOffBits = (DWORD)sizeof(BITMAPFILEHEADER) + (DWORD)sizeof(BITMAPINFOHEADER);
+
+		//Size of the file
+		bmfHeader.bfSize = dwSizeofDIB;
+
+		//bfType must always be BM for Bitmaps
+		bmfHeader.bfType = 0x4D42; //BM   
+
+		DWORD dwBytesWritten = 0;
+		WriteFile(hFile, (LPSTR)&bmfHeader, sizeof(BITMAPFILEHEADER), &dwBytesWritten, NULL);
+		WriteFile(hFile, (LPSTR)&bi, sizeof(BITMAPINFOHEADER), &dwBytesWritten, NULL);
+		WriteFile(hFile, (LPSTR)lpbitmap, dwBmpSize, &dwBytesWritten, NULL);
+
+		//Unlock and Free the DIB from the heap
+		GlobalUnlock(hDIB);
+		GlobalFree(hDIB);
+
+		////Close the handle for the file that was created
+		CloseHandle(hFile);
+
+		//Clean up
+	done:
+		DeleteObject(hbmScreen);
+		DeleteObject(hdcMemDC);
+		ReleaseDC(NULL, hdcScreen);
+		ReleaseDC(hWnd, hdcWindow);
+
+		return lpbitmap;
+	}
 	Mat getCurrentImage()
 	{
 		HDC hDC = ::GetWindowDC(hWnd);//得到句柄
 		assert(hDC);
 
-		HDC hMemDC = ::CreateCompatibleDC(hDC);//建立兼容dc
+		//HDC hMemDC = ::CreateCompatibleDC(hDC);//建立兼容dc
 
-		assert(hMemDC);
+		//assert(hMemDC);
 
 		RECT rc;
 		//	::GetWindowRect(hWnd, &rc);//此矩形包括程序外边框
 		::GetClientRect(hWnd, &rc);//得到界面部分矩形大小
-		HBITMAP hBitmap = ::CreateCompatibleBitmap(hDC, rc.right - rc.left, rc.bottom - rc.top);//兼容位图
-		assert(hBitmap);
-
-		HBITMAP hOldBmp = (HBITMAP)::SelectObject(hMemDC, hBitmap);
-
-		::PrintWindow(hWnd, hMemDC, PW_CLIENTONLY);//得到画面
-
 		int width = rc.right - rc.left;
 		int height = rc.bottom - rc.top;
-		BITMAPINFOHEADER bi = { 0 };
-		CONST int nBitCount = 24;
-		bi.biSize = sizeof(BITMAPINFOHEADER);
-		bi.biWidth = width;
-		bi.biHeight = height;
-		bi.biPlanes = 1;
-		bi.biBitCount = nBitCount;
-		bi.biCompression = BI_RGB;
-		DWORD dwSize = width * 3 * height;
-		unsigned char *data = new unsigned char[dwSize];
-		::GetDIBits(hMemDC, hBitmap, 0, height, data, (BITMAPINFO*)&bi, DIB_RGB_COLORS);//将画面输出到data中
-		Mat image(height, width, CV_8UC3, data);//将uchar转换为mat类型，用于opencv
-		flip(image, image, 0);//图像上下反转
+		//HBITMAP hBitmap = ::CreateCompatibleBitmap(hDC, rc.right - rc.left, rc.bottom - rc.top);//兼容位图
+		//assert(hBitmap);
 
-		::SelectObject(hMemDC, hOldBmp);
-		::DeleteObject(hBitmap);
-		::DeleteObject(hMemDC);
-		::ReleaseDC(hWnd, hDC);
+		//HBITMAP hOldBmp = (HBITMAP)::SelectObject(hMemDC, hBitmap);
+
+		//::PrintWindow(hWnd, hMemDC, PW_CLIENTONLY);//得到画面
+
+		//BITMAPINFOHEADER bi = { 0 };
+		//CONST int nBitCount = 24;
+		//bi.biSize = sizeof(BITMAPINFOHEADER);
+		//bi.biWidth = width;
+		//bi.biHeight = height;
+		//bi.biPlanes = 1;
+		//bi.biBitCount = nBitCount;
+		//bi.biCompression = BI_RGB;
+		//DWORD dwSize = width * 3 * height;
+		//unsigned char *data = new unsigned char[dwSize];
+		//::GetDIBits(hMemDC, hBitmap, 0, height, data, (BITMAPINFO*)&bi, DIB_RGB_COLORS);//将画面输出到data中
+		char *data = CaptureAnImage(hWnd);
+		//Mat image(height, width, CV_8UC3, data);//将uchar转换为mat类型，用于opencv
+		Mat image = imread("captureqwsx.bmp");
+		//flip(image, image, 0);//图像上下反转
+		//imshow("1", image);
+		//waitKey(0);
+
+		//::SelectObject(hMemDC, hOldBmp);
+		//::DeleteObject(hBitmap);
+		//::DeleteObject(hMemDC);
+		//::ReleaseDC(hWnd, hDC);
 		
 		return image;
 	}
@@ -1051,16 +1201,17 @@ public:
 	}
 	int compareImage(Mat &a, Mat &b)
 	{
-		ORB orb;
+		auto orb = ORB::create();
 		vector<KeyPoint> keyPoints_1, keyPoints_2;
 		Mat descriptors_1, descriptors_2;
-		orb(a, Mat(), keyPoints_1, descriptors_1);
-		orb(b, Mat(), keyPoints_2, descriptors_2);
+		orb->detectAndCompute(a, Mat(), keyPoints_1, descriptors_1);
+		orb->detectAndCompute(b, Mat(), keyPoints_2, descriptors_2);
 		//	cout << clock() - t_start << endl;
 		//2.BruteForceMatcher匹配
-		BruteForceMatcher<HammingLUT> matcher;  //也可以使用ruteForce<Hamming>
+		//BruteForceMatcher<HammingLUT> matcher;  //也可以使用ruteForce<Hamming>
+		auto matcher = DescriptorMatcher::create(DescriptorMatcher::BRUTEFORCE);
 		vector<DMatch> matches;
-		matcher.match(descriptors_1, descriptors_2, matches);
+		matcher->match(descriptors_1, descriptors_2, matches);
 		//	cout << matches.size() << endl;
 		//	cout << clock() - t_start << endl;
 		//3.过滤匹配点
@@ -1099,7 +1250,7 @@ public:
 			stringstream ss;
 			ss << i;
 			string s = ss.str();
-			img_2 = imread("HS/T7/"+s+".png");
+			img_2 = imread(CARDSINFO +s+".png");
 			if (!img_1.data || !img_2.data)
 			{
 		//		cout << "error reading images " << endl;
@@ -1107,16 +1258,17 @@ public:
 			}
 		//	cout << clock() - t_start << endl;
 			//1.orb检测特征点并提取特征值
-			ORB orb;
+			auto orb = ORB::create();
 			vector<KeyPoint> keyPoints_1, keyPoints_2;
 			Mat descriptors_1, descriptors_2;
-			orb(img_1, Mat(), keyPoints_1, descriptors_1);
-			orb(img_2, Mat(), keyPoints_2, descriptors_2);
+			orb->detectAndCompute(img_1, Mat(), keyPoints_1, descriptors_1);
+			orb->detectAndCompute(img_2, Mat(), keyPoints_2, descriptors_2);
 		//	cout << clock() - t_start << endl;
 			//2.BruteForceMatcher匹配
-			BruteForceMatcher<HammingLUT> matcher;  //也可以使用ruteForce<Hamming>
+			//BruteForceMatcher<HammingLUT> matcher;  //也可以使用ruteForce<Hamming>
+			auto matcher = DescriptorMatcher::create(DescriptorMatcher::BRUTEFORCE);
 			vector<DMatch> matches;
-			matcher.match(descriptors_1, descriptors_2, matches);
+			matcher->match(descriptors_1, descriptors_2, matches);
 		//	cout << matches.size() << endl;
 		//	cout << clock() - t_start << endl;
 			//3.过滤匹配点
@@ -1153,7 +1305,7 @@ public:
 		stringstream ss;
 		ss << maxi;
 		string s = ss.str();
-		img_2 = imread("HS/T7/" + s + ".png");
+		img_2 = imread(CARDSINFO + s + ".png");
 		imshow("比较最接近图像", img_2);
 		waitKey(0);*/
 		return maxi;

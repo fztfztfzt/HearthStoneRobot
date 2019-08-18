@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -13,18 +13,19 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0B078743-1899-49C2-8668-07120B998F51}</ProjectGuid>
     <RootNamespace>Robot</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -39,8 +40,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>E:\opencv\build\include;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\opencv\build\x86\vc12\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\ML\opencv\modules\video\include;D:\ML\opencv\modules\stitching\include;D:\ML\opencv\modules\photo\include\;D:\ML\opencv\modules\objdetect\include;D:\ML\opencv\modules\ml\include;D:\ML\opencv\modules\imgproc\include;D:\ML\opencv\modules\videoio\include;D:\ML\opencv\modules\imgcodecs\include;D:\ML\opencv\modules\highgui\include\;D:\ML\opencv\modules\dnn\include;D:\ML\opencv\modules\imgproc\include\opencv2;D:\ML\opencv\modules\flann\include;D:\ML\opencv\modules\features2d\include;D:\ML\opencv\modules\calib3d\include;D:\ML\opencv\modules\core\include;D:\ML\opencv\build;D:\ML\opencv\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\ML\opencv\build\lib\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -51,7 +52,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opencv_calib3d2411d.lib;opencv_contrib2411d.lib;opencv_core2411d.lib;opencv_features2d2411d.lib;opencv_flann2411d.lib;opencv_gpu2411d.lib;opencv_highgui2411d.lib;opencv_imgproc2411d.lib;opencv_legacy2411d.lib;opencv_ml2411d.lib;opencv_nonfree2411d.lib;opencv_objdetect2411d.lib;opencv_ocl2411d.lib;opencv_photo2411d.lib;opencv_stitching2411d.lib;opencv_superres2411d.lib;opencv_ts2411d.lib;opencv_video2411d.lib;opencv_videostab2411d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_calib3d411d.lib;opencv_core411d.lib;opencv_features2d411d.lib;opencv_flann411d.lib;opencv_highgui411d.lib;opencv_imgproc411d.lib;opencv_ml411d.lib;opencv_objdetect411d.lib;opencv_photo411d.lib;opencv_stitching411d.lib;opencv_ts411d.lib;opencv_video411d.lib;D:\ML\opencv\build\lib\Debug\*.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
