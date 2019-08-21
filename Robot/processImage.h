@@ -11,6 +11,7 @@
 #include "opencv2/core/base.hpp"
 #include "gameInfo.h"
 #include "ControlMouse.h"
+#include "handWritten-digit-recognition-based-on-OpenCV/handWritten digit recognition based on OpenCV/recognize.h"
 using namespace cv;
 using namespace std;
 
@@ -205,9 +206,9 @@ public:
 	{
 
 		//截取背景
-		src(Rect(166, 363, 680, 115)).copyTo(selfFloorBG);
+		src(selfFloorRect).copyTo(selfFloorBG);
 		imwrite("HS/self_floor.png", selfFloorBG);
-		src(Rect(204, 229, 630, 118)).copyTo(otherFloorBG);
+		src(otherFloorRect).copyTo(otherFloorBG);
 		imwrite("HS/other_floor.png", otherFloorBG);
 		src(Rect(337, 534, 112, 110)).copyTo(weaponBG);
 		imwrite("HS/weaponBG.png", weaponBG);
@@ -359,60 +360,62 @@ public:
 	}
 	int recoNum(Mat src)//数字识别
 	{
-		Mat sub[9];
-		int h = src.rows / 3;
-		int w = src.cols / 3;
-		for (int i = 0; i < 3; ++i)
-		{
-			for (int j = 0; j < 3; ++j)
-			{
-				src(Rect(j*w, i*h, w, h)).copyTo(sub[i * 3 + j]);
-				/*imshow("sub", sub[i*3 + j]);
-				waitKey(0);*/
-			}
-		}
-		bool temp[9] = { 0 };
-		for (int i = 0; i < 9; ++i)
-		{
-			int num = 0;
-			for (int j = 0; j < sub[i].cols; ++j)
-			{
-				for (int k = 0; k < sub[i].rows; ++k)
-				{
-					if (sub[i].at<uchar>(k, j) == 255)
-					{
-						num++;
-					}
-				}
-			}
-			
-			if (num>w*h / 2) temp[i] = 1, cout << "1" << ",";
-			else cout << "0" << ",";
-			//if (i % 3 == 2) cout << endl;
-			//cout << num << " "<<endl;
-		}
-		int maxsum = 0, maxn = 0;
-		for (int i = 0; i < 11; ++i)
-		{
-			for (int k = 0; k < numModel[i].size(); ++k)
-			{
-				int sum = 0;
-				for (int j = 0; j < 9; ++j)
-				{
-					if (temp[j] == numModel[i][k][j])
-					{
-						++sum;
-					}
-				}
-				if (sum>maxsum)
-				{
-					maxsum = sum;
-					maxn = i;
-				}
-			}
-		}
-		cout << "识别出的数字是：" << maxn << endl;
-		return maxn;
+		int finalNum = handWritingImageRecognize(src);
+		return finalNum;
+		//Mat sub[9];
+		//int h = src.rows / 3;
+		//int w = src.cols / 3;
+		//for (int i = 0; i < 3; ++i)
+		//{
+		//	for (int j = 0; j < 3; ++j)
+		//	{
+		//		src(Rect(j*w, i*h, w, h)).copyTo(sub[i * 3 + j]);
+		//		/*imshow("sub", sub[i*3 + j]);
+		//		waitKey(0);*/
+		//	}
+		//}
+		//bool temp[9] = { 0 };
+		//for (int i = 0; i < 9; ++i)
+		//{
+		//	int num = 0;
+		//	for (int j = 0; j < sub[i].cols; ++j)
+		//	{
+		//		for (int k = 0; k < sub[i].rows; ++k)
+		//		{
+		//			if (sub[i].at<uchar>(k, j) == 255)
+		//			{
+		//				num++;
+		//			}
+		//		}
+		//	}
+		//	
+		//	if (num>w*h / 2) temp[i] = 1, cout << "1" << ",";
+		//	else cout << "0" << ",";
+		//	//if (i % 3 == 2) cout << endl;
+		//	//cout << num << " "<<endl;
+		//}
+		//int maxsum = 0, maxn = 0;
+		//for (int i = 0; i < 11; ++i)
+		//{
+		//	for (int k = 0; k < numModel[i].size(); ++k)
+		//	{
+		//		int sum = 0;
+		//		for (int j = 0; j < 9; ++j)
+		//		{
+		//			if (temp[j] == numModel[i][k][j])
+		//			{
+		//				++sum;
+		//			}
+		//		}
+		//		if (sum>maxsum)
+		//		{
+		//			maxsum = sum;
+		//			maxn = i;
+		//		}
+		//	}
+		//}
+		//cout << "识别出的数字是：" << maxn << endl;
+		//return maxn;
 	}
 	void recoHandCrad(Mat src, GameInfo &gameInfo)
 	{
@@ -554,7 +557,7 @@ public:
 		Mat gray,floor_gray;
 		cvtColor(src, gray, CV_BGR2GRAY);
 		cvtColor(floor, floor_gray, CV_BGR2GRAY);
-		imshow("yuan", src);
+		//imshow("yuan", src);
 		//imshow("floor", floor);
 		subtract(floor_gray, gray, out);
 		cout << "当前场面减去场面背景成功！" << endl;
@@ -581,29 +584,30 @@ public:
 			}
 		}
 		cout << bg << " " << ed << endl;
-		int count = (ed - bg + 95) / 96;
+		const int MonsterWidth = MONSTERWIDTH + MONSTERSPAN;
+		int count = (ed - bg + 50 - MONSTERSPAN) / MonsterWidth;
 		gameInfo.selfMonsterNum = 0;
 		for (int i = 0; i < count; ++i)
 		{
-			Rect r0(bg + i * 96, 0, 96, thr.rows);
+			Rect r0(bg + i * MonsterWidth, 0, MonsterWidth, thr.rows);
 			Mat temp;
 			if (r0.x + r0.width>src.cols || r0.y+r0.height>src.rows) continue;
 			src(r0).copyTo(temp);
-			/*imshow("tests", temp);
-			waitKey(0);*/
+			//imshow("tests", temp);
+			//waitKey(0);
 			int x = r0.x + r0.width / 2;
 			int y = r0.y + r0.height / 2;
-			x += 10 + 166;
-			y += 30 + 363;
+			x += 10 + selfFloorRect.x;
+			y += 30 + selfFloorRect.y;
 
 			ControlMouse *cm = ControlMouse::getInstance();
 			cm->moveToPosition(x, y);
 			Sleep(1000);
 			Mat image = getCurrentImage();
 			Mat sub;
-			image(Rect(r0.x + r0.width + 166 + 10, r0.y + 363 - r0.height / 2 - 30, 205, 275)).copyTo(sub);
-			/*imshow("sub",sub);
-			waitKey(0);*/
+			image(Rect(r0.x + r0.width + selfFloorRect.x + 3, r0.y + selfFloorRect.y - MONSTERCARDPOPHEIGHT / 2 + r0.height / 2, MONSTERCARDPOPWIDTH, MONSTERCARDPOPHEIGHT)).copyTo(sub);
+			//imshow("sub",sub);
+			//waitKey(0);
 			int cardID = compareImageByORB(sub);
 			gameInfo.selfMonster[gameInfo.selfMonsterNum] = allCards[cardID];
 			gameInfo.selfMonster[gameInfo.selfMonsterNum].x = x;
@@ -758,8 +762,8 @@ public:
 		Mat result(gray.size(), CV_8U, Scalar(255));
 		result.setTo(Scalar(255));
 		drawContours(result, contours, -1, Scalar(0), 2);
-	//	imshow("提取外围轮廓", result);
-	//	waitKey(0);
+		//imshow("提取外围轮廓", result);
+		//waitKey(0);
 		Mat matio;
 		int num = contours.size();
 		int sum = 0;
@@ -771,9 +775,9 @@ public:
 			src(r0).copyTo(matio);
 			rectangle(src, r0, Scalar(255), 2);
 			//imshow("", matio);
-			
-			sum = sum*10+recoNum(matio);
 			//waitKey(0);
+			sum = sum*10+recoNum(matio);
+
 		}
 		return sum;
 	}
@@ -796,7 +800,6 @@ public:
 		//dilate(thr, thr, element);
 		//erode(thr, thr, element);
 		
-
 		int sum = 0,bg=0,ed=0;
 		for (int i = 0; i < thr.cols; ++i)
 		{
@@ -807,20 +810,25 @@ public:
 			}
 		}
 		cout << bg << " " << ed << endl;
-		int count = (ed - bg+95) / 96;
+		const int MonsterWidth = MONSTERWIDTH + MONSTERSPAN;
+		int count = (ed - bg + 50 - MONSTERSPAN) / MonsterWidth;
 		gameInfo.otherMonsterNum = 0;
 		for (int i = 0; i < count; ++i)
 		{
-			Rect r0(bg + i * 96, 0, 96, thr.rows);
+			Rect r0(bg + i * MonsterWidth, 0, MonsterWidth, thr.rows);
 			Mat temp;
 			if (r0.x + r0.width>src.cols || r0.y + r0.height>src.rows) continue;
-			src(r0).copyTo(temp);
-			/*imshow("tests", temp);
-			waitKey(0);*/
-			int x = r0.x+r0.width / 2+10;
-			int y = r0.height/2;
-			x += 204;
-			y +=  229+40;
+			Rect rcMonsterInner(bg + (i - 1) * MonsterWidth + MONSTERWIDTH, 0, MONSTERWIDTH, MONSTERHEIGHT);
+			src(rcMonsterInner).copyTo(temp);
+			//imshow("tests", temp);
+			//waitKey(0);
+			int x = r0.x+r0.width / 2;
+			int y = r0.height / 2;
+			x += otherFloorRect.x + 10;
+			y +=  otherFloorRect.y + 30;
+
+			ControlMouse *cm = ControlMouse::getInstance();
+			cm->moveToPosition(x, y);
 			
 			//imshow("1",temp);
 			//waitKey(0);
@@ -931,7 +939,7 @@ public:
 	{
 		cout << "识别已方场上随从" << endl;
 		Mat selfFloor;
-		src(Rect(342, 273, 883, 288)).copyTo(selfFloor);
+		src(selfFloorRect).copyTo(selfFloor);
 		recoSelfMonster(selfFloor, gameInfo);
 		//cout << "判断英雄是否有武器" << endl;
 		//clock_t start = clock();
@@ -955,7 +963,8 @@ public:
 		}
 		cout << "识别对方场上随从" << endl;
 		Mat otherFloor;
-		src(Rect(204, 229, 630, 118)).copyTo(otherFloor);
+		//Rect(204, 229, 630, 118)
+		src(otherFloorRect).copyTo(otherFloor);
 		recoOtherMonster(otherFloor, gameInfo);
 		Sleep(1000);
 	}
@@ -1162,7 +1171,7 @@ public:
 	{
 		Sleep(1000);
 		Mat image;
-		src(Rect(924, 340, 45, 10)).copyTo(image);
+		src(endButton).copyTo(image);
 		int i = 0, j = 0;
 		uchar r = image.at<Vec3b>(i, j)[0];
 		uchar g = image.at<Vec3b>(i, j)[1];

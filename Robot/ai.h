@@ -1,9 +1,10 @@
 #pragma once
+#include "define.h"
 #include "gameInfo.h"
 #include "ControlMouse.h"
-#include "define.h"
 #include "processImage.h"
-bool cmp(Card a, Card b)
+#include <algorithm>
+bool cmpFunc(Card a, Card b)
 {
 	return a.spend < b.spend;
 }
@@ -101,7 +102,7 @@ public:
 			cout << "当前费用：" << gameInfo.currentSpend << " 可用费用:" << gameInfo.couldUseSpend << endl;
 			
 			//将手牌按费用排序
-			sort(gameInfo.handCard, gameInfo.handCard + gameInfo.currentNum, cmp);
+			std::sort(gameInfo.handCard, gameInfo.handCard + gameInfo.currentNum, cmpFunc);
 			/*for (int i = 0; i < gameInfo.currentNum; ++i)
 			{
 				cout << gameInfo.handCard[i].name;
