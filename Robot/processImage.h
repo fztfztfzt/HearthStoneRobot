@@ -204,7 +204,6 @@ public:
 	}
 	void fightStart(Mat &src)
 	{
-
 		//截取背景
 		src(selfFloorRect).copyTo(selfFloorBG);
 		imwrite("HS/self_floor.png", selfFloorBG);
@@ -242,7 +241,6 @@ public:
 					src.at<Vec3b>(i, j)[1] = 0;
 					src.at<Vec3b>(i, j)[2] = 0;
 				}
-				
 			}
 		}
 		Mat gray;
@@ -483,7 +481,7 @@ public:
 		std::vector<std::vector<Point>>::const_iterator itc = contours.begin();
 		while (itc != contours.end())
 		{
-			cout << "手牌数字部分轮廓大小：" << itc->size()<<endl;
+			//cout << "手牌数字部分轮廓大小：" << itc->size()<<endl;
 			if (itc->size() < cmin || itc->size() > cmax)
 				itc = contours.erase(itc);
 			else
@@ -699,9 +697,13 @@ public:
 			}
 		}
 		cout << "sum:" << sum << "宽 高:" << src2.rows << " "<<src2.cols << endl;
-		//imshow("image", image);
-		//waitKey(0);
-		return sum>2500;
+		bool bIsTaunt = (sum > 2500);
+		if (bIsTaunt) {
+			cout << "发现嘲讽"<<endl;
+			/*imshow("image", src2);
+			waitKey(0);*/
+		}
+		return false;
 	}
 	
 	int recoImageNum(Mat src)
@@ -752,7 +754,7 @@ public:
 		std::vector<std::vector<Point>>::const_iterator itc = contours.begin();
 		while (itc != contours.end())
 		{
-			cout << "手牌数字部分轮廓大小：" << itc->size() << endl;
+			//cout << "手牌数字部分轮廓大小：" << itc->size() << endl;
 			if (itc->size() < cmin || itc->size() > cmax)
 				itc = contours.erase(itc);
 			else

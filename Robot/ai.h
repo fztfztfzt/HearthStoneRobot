@@ -4,9 +4,13 @@
 #include "ControlMouse.h"
 #include "processImage.h"
 #include <algorithm>
-bool cmpFunc(Card a, Card b)
+bool compareSpend(Card a, Card b)
 {
 	return a.spend < b.spend;
+}
+
+bool compareAttribute(Card a, Card b) {
+	return (a.life + a.attack) < (b.life + b.attack)
 }
 class AI
 {
@@ -102,76 +106,49 @@ public:
 			cout << "当前费用：" << gameInfo.currentSpend << " 可用费用:" << gameInfo.couldUseSpend << endl;
 			
 			//将手牌按费用排序
-			std::sort(gameInfo.handCard, gameInfo.handCard + gameInfo.currentNum, cmpFunc);
-			/*for (int i = 0; i < gameInfo.currentNum; ++i)
+			std::sort(gameInfo.handCard, gameInfo.handCard + gameInfo.currentNum, compareSpend);
+			
+			for (int i = 0; i < gameInfo.currentNum; ++i)
 			{
-				cout << gameInfo.handCard[i].name;
-			}*/
-			//if (gameInfo.currentSpend == 1)//1费情况
-			{
-				
-				for (int i = 0; i < gameInfo.currentNum; ++i)
+				if (!gameInfo.first && gameInfo.handCard[i].behavior == "下场" && gameInfo.handCard[i].spend == gameInfo.couldUseSpend + 1)
 				{
-					if (!gameInfo.first && gameInfo.handCard[i].behavior == "下场" && gameInfo.handCard[i].spend == gameInfo.couldUseSpend + 1)
-					{
-						controlMouse->playCard(gameInfo.handCard[0].x, gameInfo.handCard[0].y);//幸运币
-						gameInfo.currentNum -= 1;
-						gameInfo.first = true;//幸运币出掉
-						++gameInfo.couldUseSpend;
-						cout << "下幸运币，重新识别手牌位置" << endl;
-						return;
-						
-						//cout << "ai:出牌：费用" << gameInfo.handCard[i].spend << " 可用费用：" << gameInfo.couldUseSpend << " 位置：" << gameInfo.handCard[i].x << " " << gameInfo.handCard[i].y << endl;
-						//controlMouse->playCard(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
-						//gameInfo.couldUseSpend -= gameInfo.handCard[i].spend;
-						//++havePlayNum;//已出牌数量+1，不包括幸运币
-						//Sleep(100);
-						//break;
-					}
-					if (gameInfo.handCard[i].behavior == "下场" && gameInfo.handCard[i].spend <= gameInfo.couldUseSpend)
-					{
-						if (gameInfo.handCard[i].type == "武器")
-						{
-							if (gameInfo.haveWeapon) continue;
-							else gameInfo.haveWeapon = true;
-						}
-						cout << "ai:出牌：" << gameInfo.handCard[i].name<<" 费用" << gameInfo.handCard[i].spend << " 可用费用：" << gameInfo.couldUseSpend << " 位置：" << gameInfo.handCard[i].x << " " << gameInfo.handCard[i].y << endl;
-						controlMouse->playCard(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
-						gameInfo.couldUseSpend -= gameInfo.handCard[i].spend;
-						++havePlayNum;//已出牌数量+1，不包括幸运币
-						if (gameInfo.couldUseSpend + !gameInfo.first < gameInfo.handCard[i].spend) break;//不会在出牌则不用重新扫描
-						return;//重新扫描，确认手牌位置
-						
-					}
+					controlMouse->playCard(gameInfo.handCard[0].x, gameInfo.handCard[0].y);//幸运币
+					gameInfo.currentNum -= 1;
+					gameInfo.first = true;//幸运币出掉
+					++gameInfo.couldUseSpend;
+					cout << "下幸运币，重新识别手牌位置" << endl;
+					return;
 				}
-
-				for (int i = 0; i < gameInfo.currentNum; ++i)
+				if (gameInfo.handCard[i].behavior == "下场" && gameInfo.handCard[i].spend <= gameInfo.couldUseSpend)
 				{
-					if (gameInfo.handCard[i].behavior == "敌人" && gameInfo.handCard[i].spend <= gameInfo.couldUseSpend)
+					if (gameInfo.handCard[i].type == "武器")
 					{
-						cout << "ai:出牌：" << gameInfo.handCard[i].name<<" 费用" << gameInfo.handCard[i].spend << " 可用费用：" << gameInfo.couldUseSpend << " 位置：" << gameInfo.handCard[i].x << " " << gameInfo.handCard[i].y << endl;
-						controlMouse->playCardToPlayer(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
-						gameInfo.couldUseSpend -= gameInfo.handCard[i].spend;
-						++havePlayNum;//已出牌数量+1，不包括幸运币
-						if (gameInfo.couldUseSpend + !gameInfo.first < gameInfo.handCard[i].spend) break;//不会在出牌则不用重新扫描
-						return;//重新扫描，确认手牌位置
+						if (gameInfo.haveWeapon) continue;
+						else gameInfo.haveWeapon = true;
 					}
+					cout << "ai:出牌：" << gameInfo.handCard[i].name << " 费用" << gameInfo.handCard[i].spend << " 可用费用：" << gameInfo.couldUseSpend << " 位置：" << gameInfo.handCard[i].x << " " << gameInfo.handCard[i].y << endl;
+					controlMouse->playCard(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
+					gameInfo.couldUseSpend -= gameInfo.handCard[i].spend;
+					++havePlayNum;//已出牌数量+1，不包括幸运币
+					if (gameInfo.couldUseSpend + !gameInfo.first < gameInfo.handCard[i].spend) break;//不会出牌则不用重新扫描
+					return;//重新扫描，确认手牌位置
 				}
 			}
-			
-			//for (int i = 0; i < gameInfo.currentNum; ++i)//最简单的AI，有啥出啥
-			//{
-			//	if (gameInfo.handCard[i].behavior == "下场" && gameInfo.handCard[i].spend!=0 && gameInfo.handCard[i].spend <= gameInfo.couldUseSpend)
-			//	{
-			//		cout << "ai:出牌：费用" << gameInfo.handCard[i].spend << " 可用费用：" << gameInfo.couldUseSpend << " 位置：" << gameInfo.handCard[i].x << " " << gameInfo.handCard[i].y << endl;
-			//		controlMouse->playCard(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
-			//		gameInfo.couldUseSpend -= gameInfo.handCard[i].spend;
-			//		Sleep(100);
-			//	}
-			//}
+
+			for (int i = 0; i < gameInfo.currentNum; ++i)
+			{
+				if (gameInfo.handCard[i].behavior == "敌人" && gameInfo.handCard[i].spend <= gameInfo.couldUseSpend)
+				{
+					cout << "ai:出牌：" << gameInfo.handCard[i].name << " 费用" << gameInfo.handCard[i].spend << " 可用费用：" << gameInfo.couldUseSpend << " 位置：" << gameInfo.handCard[i].x << " " << gameInfo.handCard[i].y << endl;
+					controlMouse->playCardToPlayer(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
+					gameInfo.couldUseSpend -= gameInfo.handCard[i].spend;
+					++havePlayNum;//已出牌数量+1，不包括幸运币
+					if (gameInfo.couldUseSpend + !gameInfo.first < gameInfo.handCard[i].spend) break;//不会在出牌则不用重新扫描
+					return;//重新扫描，确认手牌位置
+				}
+			}
 
 			gameInfo.state = STATE_SELFTURN_FIGHT;
-			
 			controlMouse->moveToPosition(OutSideX, OutSideY);
 			Sleep(1000);
 			break;
@@ -182,7 +159,7 @@ public:
 				bool flag = false;
 				for (int j = 0; j < gameInfo.otherMonsterNum; ++j)
 				{
-					gameInfo.otherMonster[j].taugh = false; //TODO
+					//gameInfo.otherMonster[j].taugh = false; //TODO
 					if (gameInfo.otherMonster[j].taugh)
 					{
 						flag = true;
