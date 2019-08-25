@@ -30,8 +30,8 @@ public:
 	{
 		touchPosition(x, y);
 		Sleep(1000);
-		double stepx = 520.0-x;
-		double stepy = 180.0-y;
+		double stepx = 800.0 -x;
+		double stepy = 180.0 - y;
 		for (int i = 0; i < 20;++i)
 		{
 			x += stepx / 20;
@@ -39,7 +39,7 @@ public:
 			mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, x / screenWidth * 65535, y / screenHeight * 65535, 0, 0);
 			Sleep(100);
 		}
-		mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, 520.0 / screenWidth * 65535, 180.0 / screenHeight * 65535, 0, 0);
+		mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, 800.0 / screenWidth * 65535, 180.0 / screenHeight * 65535, 0, 0);
 		Sleep(500);
 		mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
 		Sleep(500);

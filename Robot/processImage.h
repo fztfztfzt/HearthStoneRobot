@@ -96,13 +96,14 @@ public:
 	}
 	void initVideo(Mat &src, GameInfo &gameInfo)
 	{
-		
+		return;
 		string fname = "HS/video/" + std::to_string(gameInfo.currentTimes) + ".avi";
 		gameInfo.currentTimes++;
 		outputVideo.open(fname, CV_FOURCC('M', 'J', 'P', 'G'), 1, Size(src.cols, src.rows), true);
 	}
 	void saveVideo(Mat &src, GameInfo &gameInfo)
 	{
+		return;
 		outputVideo << src;
 	}
 	void releaseVideo()
@@ -166,7 +167,6 @@ public:
 	void process(GameInfo &gameInfo)
 	{
 		Mat src = getCurrentImage();
-		
 		switch (gameInfo.state)
 		{
 		case STATE_STARTGAME:
@@ -360,62 +360,62 @@ public:
 	}
 	int recoNum(Mat src)//数字识别
 	{
-		int finalNum = handWritingImageRecognize(src);
-		return finalNum;
-		//Mat sub[9];
-		//int h = src.rows / 3;
-		//int w = src.cols / 3;
-		//for (int i = 0; i < 3; ++i)
-		//{
-		//	for (int j = 0; j < 3; ++j)
-		//	{
-		//		src(Rect(j*w, i*h, w, h)).copyTo(sub[i * 3 + j]);
-		//		/*imshow("sub", sub[i*3 + j]);
-		//		waitKey(0);*/
-		//	}
-		//}
-		//bool temp[9] = { 0 };
-		//for (int i = 0; i < 9; ++i)
-		//{
-		//	int num = 0;
-		//	for (int j = 0; j < sub[i].cols; ++j)
-		//	{
-		//		for (int k = 0; k < sub[i].rows; ++k)
-		//		{
-		//			if (sub[i].at<uchar>(k, j) == 255)
-		//			{
-		//				num++;
-		//			}
-		//		}
-		//	}
-		//	
-		//	if (num>w*h / 2) temp[i] = 1, cout << "1" << ",";
-		//	else cout << "0" << ",";
-		//	//if (i % 3 == 2) cout << endl;
-		//	//cout << num << " "<<endl;
-		//}
-		//int maxsum = 0, maxn = 0;
-		//for (int i = 0; i < 11; ++i)
-		//{
-		//	for (int k = 0; k < numModel[i].size(); ++k)
-		//	{
-		//		int sum = 0;
-		//		for (int j = 0; j < 9; ++j)
-		//		{
-		//			if (temp[j] == numModel[i][k][j])
-		//			{
-		//				++sum;
-		//			}
-		//		}
-		//		if (sum>maxsum)
-		//		{
-		//			maxsum = sum;
-		//			maxn = i;
-		//		}
-		//	}
-		//}
-		//cout << "识别出的数字是：" << maxn << endl;
-		//return maxn;
+		//int finalNum = handWritingImageRecognize(src);
+		//return finalNum;
+		Mat sub[9];
+		int h = src.rows / 3;
+		int w = src.cols / 3;
+		for (int i = 0; i < 3; ++i)
+		{
+			for (int j = 0; j < 3; ++j)
+			{
+				src(Rect(j*w, i*h, w, h)).copyTo(sub[i * 3 + j]);
+				/*imshow("sub", sub[i*3 + j]);
+				waitKey(0);*/
+			}
+		}
+		bool temp[9] = { 0 };
+		for (int i = 0; i < 9; ++i)
+		{
+			int num = 0;
+			for (int j = 0; j < sub[i].cols; ++j)
+			{
+				for (int k = 0; k < sub[i].rows; ++k)
+				{
+					if (sub[i].at<uchar>(k, j) == 255)
+					{
+						num++;
+					}
+				}
+			}
+			
+			if (num>w*h / 2) temp[i] = 1, cout << "1" << ",";
+			else cout << "0" << ",";
+			//if (i % 3 == 2) cout << endl;
+			//cout << num << " "<<endl;
+		}
+		int maxsum = 0, maxn = 0;
+		for (int i = 0; i < 11; ++i)
+		{
+			for (int k = 0; k < numModel[i].size(); ++k)
+			{
+				int sum = 0;
+				for (int j = 0; j < 9; ++j)
+				{
+					if (temp[j] == numModel[i][k][j])
+					{
+						++sum;
+					}
+				}
+				if (sum>maxsum)
+				{
+					maxsum = sum;
+					maxn = i;
+				}
+			}
+		}
+		cout << "识别出的数字是：" << maxn << endl;
+		return maxn;
 	}
 	void recoHandCrad(Mat src, GameInfo &gameInfo)
 	{
@@ -561,20 +561,20 @@ public:
 		//imshow("floor", floor);
 		subtract(floor_gray, gray, out);
 		cout << "当前场面减去场面背景成功！" << endl;
-		//imshow("test", out);
-		waitKey(0);
 		Mat thr;
 		threshold(out, thr, 40, 255, CV_THRESH_BINARY);
-		Mat element = getStructuringElement(MORPH_RECT, Size(3, 3));//腐蚀膨胀效果不好
-		dilate(thr, thr, element);
-		erode(thr, thr, element);
-		dilate(thr, thr, element);
-		erode(thr, thr, element);
-		cout << "腐蚀膨胀结束！" << endl;
+		//imshow("test", thr);
+		//waitKey(0);
+		//Mat element = getStructuringElement(MORPH_RECT, Size(3, 3));//腐蚀膨胀效果不好
+		//dilate(thr, thr, element);
+		//erode(thr, thr, element);
+		//dilate(thr, thr, element);
+		//erode(thr, thr, element);
+		//cout << "腐蚀膨胀结束！" << endl;
 		/*imshow("thr", thr);
 		waitKey(0);*/
 
-		int sum = 0, bg = 0, ed = 0;
+		int bg = 0, ed = 0;
 		for (int i = 0; i < thr.cols; ++i)
 		{
 			if (thr.at<uchar>(thr.rows / 2, i) == 255)
@@ -585,7 +585,7 @@ public:
 		}
 		cout << bg << " " << ed << endl;
 		const int MonsterWidth = MONSTERWIDTH + MONSTERSPAN;
-		int count = (ed - bg + 50 - MONSTERSPAN) / MonsterWidth;
+		int count = (ed - bg + 50 + MONSTERSPAN) / MonsterWidth;
 		gameInfo.selfMonsterNum = 0;
 		for (int i = 0; i < count; ++i)
 		{
@@ -699,8 +699,8 @@ public:
 			}
 		}
 		cout << "sum:" << sum << "宽 高:" << src2.rows << " "<<src2.cols << endl;
-		/*imshow("image", image);
-		waitKey(0);*/
+		//imshow("image", image);
+		//waitKey(0);
 		return sum>2500;
 	}
 	

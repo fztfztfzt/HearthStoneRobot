@@ -19,7 +19,7 @@ public:
 	}
 	void startGame(GameInfo &gameInfo)
 	{
-		cout << "游戏阶段：开始新的一轮练习模式,选择法师，点击开始按钮，延时1秒" << endl;
+		cout << "游戏开始：开始新的一轮练习模式,选择法师，点击开始按钮，延时1秒" << endl;
 
 		//练习模式：
 		Sleep(1000);
@@ -182,6 +182,7 @@ public:
 				bool flag = false;
 				for (int j = 0; j < gameInfo.otherMonsterNum; ++j)
 				{
+					gameInfo.otherMonster[j].taugh = false; //TODO
 					if (gameInfo.otherMonster[j].taugh)
 					{
 						flag = true;
@@ -192,8 +193,6 @@ public:
 							cout << "我方进攻随从死亡，重新扫描场上随从" << endl;
 							return;
 						}
-						
-						
 					}
 				}
 				if (!flag)

@@ -35,7 +35,7 @@ const int HearthWindowHeight = 900;
 //std::string CARDSDES = "HS/Magic1/cardInfo.txt";
 const cv::Rect confirmButton(735, 675, 145, 78);
 const cv::Rect endButton(1262, 420, 119, 43);
-
+// 98 15?
 #define MONSTERWIDTH 100
 #define MONSTERSPAN 17
 #define MONSTERHEIGHT 135

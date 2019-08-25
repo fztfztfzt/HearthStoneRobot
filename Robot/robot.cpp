@@ -20,8 +20,8 @@ int main()
 	GameInfo gameInfo;
 	AI aiControl(hWnd);
 	aiControl.startGame(gameInfo);
-	gameInfo.state = STATE_CHANGECARDSTART;
-	while (1)
+	//gameInfo.state = STATE_SELFTURN_FIGHT;
+	while (true)
 	{
 		processImage->process(gameInfo);
 		aiControl.process(gameInfo);
