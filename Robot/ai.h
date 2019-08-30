@@ -10,8 +10,9 @@ bool compareSpend(Card a, Card b)
 }
 
 bool compareAttribute(Card a, Card b) {
-	return (a.life + a.attack) < (b.life + b.attack)
+	return (a.life + a.attack) > (b.life + b.attack);
 }
+
 class AI
 {
 	HWND hWnd;
@@ -26,14 +27,15 @@ public:
 		cout << "游戏开始：开始新的一轮练习模式,选择法师，点击开始按钮，延时1秒" << endl;
 
 		//练习模式：
-		Sleep(1000);
-		controlMouse->touchPosition(810, 350); // 点击冒险模式
-		Sleep(1000);//延时1s
-		controlMouse->touchPosition(1149, 223); // 点击Normal模式
-		controlMouse->touchPosition(1164,771);//点击选择按钮
+		//Sleep(1000);
+		//controlMouse->touchPosition(810, 350); // 点击冒险模式
+		//Sleep(1000);//延时1s
+		//controlMouse->touchPosition(1149, 223); // 点击Normal模式
+		//controlMouse->touchPosition(1164,771);//点击选择按钮
 		controlMouse->touchPosition(594, 632);//选择法师
 		controlMouse->touchPosition(1164, 760);//点击Play按钮
-		controlMouse->touchPosition(1187, 193); // 选择猎人
+		//controlMouse->touchPosition(1187, 193); // 选择猎人
+		controlMouse->touchPosition(1187, 222); // 选择战士
 		controlMouse->touchPosition(1164, 760); //点击Play按钮
 		Sleep(6000);//延时6s
 		gameInfo.state = STATE_CHANGECARDSTART;
@@ -80,6 +82,7 @@ public:
 	
 	void process(GameInfo &gameInfo)
 	{
+		Card handCardCopy[10];
 		switch (gameInfo.state)
 		{
 		case STATE_STARTGAME:
@@ -107,10 +110,13 @@ public:
 			
 			//将手牌按费用排序
 			std::sort(gameInfo.handCard, gameInfo.handCard + gameInfo.currentNum, compareSpend);
-			
+			for (int i = 0; i < gameInfo.currentNum; ++i) {
+				handCardCopy[i] = gameInfo.handCard[i];
+			}
+			std::sort(handCardCopy, handCardCopy + gameInfo.currentNum, compareAttribute);
 			for (int i = 0; i < gameInfo.currentNum; ++i)
 			{
-				if (!gameInfo.first && gameInfo.handCard[i].behavior == "下场" && gameInfo.handCard[i].spend == gameInfo.couldUseSpend + 1)
+				if (!gameInfo.first && handCardCopy[i].behavior == "下场" && handCardCopy[i].spend == gameInfo.couldUseSpend + 1)
 				{
 					controlMouse->playCard(gameInfo.handCard[0].x, gameInfo.handCard[0].y);//幸运币
 					gameInfo.currentNum -= 1;
@@ -119,18 +125,18 @@ public:
 					cout << "下幸运币，重新识别手牌位置" << endl;
 					return;
 				}
-				if (gameInfo.handCard[i].behavior == "下场" && gameInfo.handCard[i].spend <= gameInfo.couldUseSpend)
+				if (handCardCopy[i].behavior == "下场" && handCardCopy[i].spend <= gameInfo.couldUseSpend)
 				{
-					if (gameInfo.handCard[i].type == "武器")
+					if (handCardCopy[i].type == "武器")
 					{
 						if (gameInfo.haveWeapon) continue;
 						else gameInfo.haveWeapon = true;
 					}
-					cout << "ai:出牌：" << gameInfo.handCard[i].name << " 费用" << gameInfo.handCard[i].spend << " 可用费用：" << gameInfo.couldUseSpend << " 位置：" << gameInfo.handCard[i].x << " " << gameInfo.handCard[i].y << endl;
-					controlMouse->playCard(gameInfo.handCard[i].x, gameInfo.handCard[i].y);
-					gameInfo.couldUseSpend -= gameInfo.handCard[i].spend;
+					cout << "ai:出牌：" << handCardCopy[i].name << " 费用" << handCardCopy[i].spend << " 可用费用：" << gameInfo.couldUseSpend << " 位置：" << handCardCopy[i].x << " " << handCardCopy[i].y << endl;
+					controlMouse->playCard(handCardCopy[i].x, handCardCopy[i].y);
+					gameInfo.couldUseSpend -= handCardCopy[i].spend;
 					++havePlayNum;//已出牌数量+1，不包括幸运币
-					if (gameInfo.couldUseSpend + !gameInfo.first < gameInfo.handCard[i].spend) break;//不会出牌则不用重新扫描
+					if (gameInfo.couldUseSpend + !gameInfo.first < handCardCopy[i].spend) break;//不会出牌则不用重新扫描
 					return;//重新扫描，确认手牌位置
 				}
 			}
@@ -179,7 +185,6 @@ public:
 				}
 			}
 			
-	
 			controlMouse->touchPosition(HeroSkillX, HeroSkillY);//使用英雄技能
 			gameInfo.state = STATE_OTHERTURN;//改变游戏状态
 			gameInfo.currentSpend++;

@@ -13,9 +13,33 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="源文件\num">
+      <UniqueIdentifier>{eddc52f2-4fa0-45bc-b525-38005f550d8b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="robot.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\feature.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\loadMNIST.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\mousedraw.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\preprocess.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\recognize.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\segment.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\SVM_on_handWritten.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,5 +59,54 @@
     <ClInclude Include="define.h">
       <Filter>源文件</Filter>
     </ClInclude>
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\features.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\global.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\loadMNIST.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\mousedraw.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\mycore.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\preprocess.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\recognize.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\segment.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\SVM_on_handWritten.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\SVM.xml" />
+    <Xml Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\SVM2.xml" />
+    <Xml Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\SVM3.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\t10k-images.idx3-ubyte" />
+    <None Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\t10k-labels.idx1-ubyte" />
+    <None Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\train-images.idx3-ubyte" />
+    <None Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\train-labels.idx1-ubyte" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\testImage.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\testImage2.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\testImage3.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>

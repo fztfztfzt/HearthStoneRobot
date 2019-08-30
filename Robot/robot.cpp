@@ -27,28 +27,6 @@ int main()
 		aiControl.process(gameInfo);
 		Sleep(1000);
 	}
-	
-	//ControlMouse control(hWnd);
-	//control.playCard(450, 745);
-//	Mat image = getCurrentImage(hWnd);
-////	imshow("test", image);
-//	processImage process;
-//	GameInfo cinfo;
-//	process.process(image,cinfo);
-//	ControlMouse controlMouse(hWnd);
-//	for (int i = 0; i < cinfo.currentNum; ++i)
-//		cout << "cardnum:" << cinfo.handCard[i].spend << endl;
-//	for (int i = 0; i < cinfo.currentNum; ++i)
-//	{
-//		if (cinfo.handCard[i].spend >= 2)
-//		{
-//			cout << cinfo.handCard[i].x << " " << cinfo.handCard[i].y << endl;
-//			controlMouse.touchPosition(cinfo.handCard[i].x, cinfo.handCard[i].y);
-//			Sleep(100);
-//		}
-//	}
-//	//È·¶¨
-//	controlMouse.touchPosition(500, 600);
-//	Sleep(100);
+
 	system("pause");
 }

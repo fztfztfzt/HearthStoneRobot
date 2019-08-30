@@ -67,7 +67,7 @@ private:
 		screenWidth = GetSystemMetrics(SM_CXSCREEN);
 		screenHeight = GetSystemMetrics(SM_CYSCREEN);
 		SetForegroundWindow(hWnd);
-		//::SetActiveWindow(hWnd);
+		::SetActiveWindow(hWnd);
 		RECT rc;
 		::GetWindowRect(hWnd, &rc);
 		RECT rcClient;

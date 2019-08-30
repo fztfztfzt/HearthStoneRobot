@@ -160,10 +160,7 @@ public:
 		}
 	
 	}
-	void startGame(Mat &src,GameInfo &gameInfo)
-	{
-		
-	}
+	
 	void process(GameInfo &gameInfo)
 	{
 		Mat src = getCurrentImage();
@@ -190,7 +187,7 @@ public:
 			break;
 		case STATE_OTHERTURN:
 			saveVideo(src, gameInfo);
-			otherTrun(src, gameInfo);
+			otherTurn(src, gameInfo);
 			isGameOver(gameInfo);
 			break;
 		case STATE_GAMEOVE:
@@ -199,8 +196,6 @@ public:
 		default:
 			break;
 		}
-		
-	
 	}
 	void fightStart(Mat &src)
 	{
@@ -215,7 +210,6 @@ public:
 		imwrite("HS/gameOverOtherBG.png", gameOverOtherBG);
 		src(Rect(455, 515, 110, 120)).copyTo(gameOverSelfBG);
 		imwrite("HS/gameOverSelfBG.png", gameOverSelfBG);
-		
 	}
 	void changeCardStart(Mat src, GameInfo &gameInfo)//Ô¤´¦Àí·¢ÅÆ½×¶ÎÍ¼Ïñ
 	{
@@ -1169,7 +1163,7 @@ public:
 		
 		return image;
 	}
-	void otherTrun(Mat src, GameInfo &gameInfo)
+	void otherTurn(Mat src, GameInfo &gameInfo)
 	{
 		Sleep(1000);
 		Mat image;
