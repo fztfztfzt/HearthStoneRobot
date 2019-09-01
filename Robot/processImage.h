@@ -199,6 +199,7 @@ public:
 	}
 	void fightStart(Mat &src)
 	{
+		return;
 		//截取背景
 		src(selfFloorRect).copyTo(selfFloorBG);
 		imwrite("HS/self_floor.png", selfFloorBG);
@@ -577,7 +578,7 @@ public:
 		}
 		cout << bg << " " << ed << endl;
 		const int MonsterWidth = MONSTERWIDTH + MONSTERSPAN;
-		int count = (ed - bg + 50 + MONSTERSPAN) / MonsterWidth;
+		int count = (ed - bg + MONSTERSPAN + 50) / MonsterWidth;
 		gameInfo.selfMonsterNum = 0;
 		for (int i = 0; i < count; ++i)
 		{
@@ -662,11 +663,133 @@ public:
 		//}
 		cout << "识别自己场上随从结束！" << endl;
 	}
+	void recoOtherMonster(Mat src, GameInfo &gameInfo)
+	{
+		Mat floor = imread("HS/other_floor.png", 0);
+		Mat out;
+		Mat gray;
+		cvtColor(src, gray, CV_BGR2GRAY);
+		//imshow("yuan", gray);
+		//imshow("floor", floor);
+		subtract(floor, gray, out);
+		//imshow("test", out);
+		//waitKey(0);
+		Mat thr;
+		threshold(out, thr, 50, 255, CV_THRESH_BINARY);
+		//Mat element = getStructuringElement(MORPH_RECT, Size(3, 3));//腐蚀膨胀效果不好
+		//dilate(thr, thr, element);
+		//erode(thr, thr, element);
+		//dilate(thr, thr, element);
+		//erode(thr, thr, element);
+
+		int sum = 0, bg = 0, ed = 0;
+		for (int i = 0; i < thr.cols; ++i)
+		{
+			if (thr.at<uchar>(thr.rows / 2, i) == 255)
+			{
+				if (bg == 0) bg = i;
+				else ed = i;
+			}
+		}
+		cout << bg << " " << ed << endl;
+		const int MonsterWidth = MONSTERWIDTH + MONSTERSPAN;
+		int count = (ed - bg + MONSTERSPAN + 50) / MonsterWidth;
+		gameInfo.otherMonsterNum = 0;
+		for (int i = 0; i < count; ++i)
+		{
+			Rect r0(bg + i * MonsterWidth, 0, MonsterWidth, thr.rows);
+			Mat temp;
+			if (r0.x + r0.width > src.cols || r0.y + r0.height > src.rows) continue;
+			int MonstersSpan = 0;
+			if (i > 0) {
+				MonstersSpan = (i - 1) * MONSTERSPAN;
+			}
+			Rect rcMonsterInner(bg + i * MonsterWidth + MonstersSpan, 0, MONSTERWIDTH, MONSTERHEIGHT);
+			src(rcMonsterInner).copyTo(temp);
+			/*imshow("tests", temp);
+			waitKey(0);*/
+			int x = r0.x + r0.width / 2;
+			int y = r0.height / 2;
+			x += otherFloorRect.x + 10;
+			y += otherFloorRect.y + 30;
+
+			ControlMouse *cm = ControlMouse::getInstance();
+			cm->moveToPosition(x, y);
+
+			//imshow("1",temp);
+			//waitKey(0);
+			gameInfo.otherMonster[gameInfo.otherMonsterNum].taugh = isTaunt(temp);
+			gameInfo.otherMonster[gameInfo.otherMonsterNum].x = x;
+			gameInfo.otherMonster[gameInfo.otherMonsterNum].y = y;
+
+			//识别数值
+			Mat attackImage;
+			temp(Rect(0, 0, temp.cols / 2, temp.rows)).copyTo(attackImage);//读取左侧数字
+
+			gameInfo.otherMonster[gameInfo.otherMonsterNum].attack = recoImageNum(attackImage);
+			Mat lifeImage;
+			temp(Rect(temp.cols / 2, 0, temp.cols / 2, temp.rows)).copyTo(lifeImage);//读取左侧数字
+			gameInfo.otherMonster[gameInfo.otherMonsterNum].life = recoImageNum(lifeImage);
+
+			cout << "出牌阶段：对方场上卡牌信息：是否嘲讽：" << gameInfo.otherMonster[gameInfo.otherMonsterNum].taugh << " 攻击：" << gameInfo.otherMonster[gameInfo.otherMonsterNum].attack << " 生命：" << gameInfo.otherMonster[gameInfo.otherMonsterNum].life << " 位置:" << gameInfo.otherMonster[gameInfo.otherMonsterNum].x << " " << gameInfo.otherMonster[gameInfo.otherMonsterNum].y << endl;
+			gameInfo.otherMonsterNum++;
+			/*imshow("sub",sub);
+			waitKey(0);*/
+		}
+
+		//vector<std::vector<Point>> contours;
+		//findContours(thr,			//图像
+		//	contours,				//轮廓点
+		//	//包含图像拓扑结构的信息（可选参数，这里没有选）
+		//	CV_RETR_EXTERNAL,			//获取轮廓的方法（这里获取外围轮廓）
+		//	CV_CHAIN_APPROX_NONE);		//轮廓近似的方法（这里不近似，获取全部轮廓）
+
+		//int cmin = 100;
+		//Mat matio[10];
+		//std::vector<std::vector<Point>>::const_iterator itc = contours.begin();
+		//gameInfo.otherMonsterNum = 0;
+		//for (int i = 0; i < contours.size(); ++i)
+		//{
+		//	cout << itc->size() << endl;
+		//	if (itc->size() > cmin)
+		//	{
+		//		Rect r0 = boundingRect(Mat(contours[i]));
+		//		if (r0.width >= r0.height) continue;
+		//		src(r0).copyTo(matio[0]);
+		//		imshow("tests",matio[0]);
+		//		waitKey(0);
+		//		int x = r0.width/2 ;
+		//		int y = r0.height/2;
+		//		x += 204;
+		//		y +=  229+40;
+		//		/*ControlMouse *cm = ControlMouse::getInstance();
+		//		cm->moveToPosition(x, y);
+		//		Sleep(1000);
+		//		HWND hWnd = ::FindWindow("UnityWndClass", CARDGAME);
+		//		Mat image = getCurrentImage(hWnd);
+		//		Mat sub;
+		//		image(Rect(x, y, 102, 126)).copyTo(sub);
+		//		imshow("sub", sub);
+		//		waitKey(0);*/
+		//	
+		//		gameInfo.otherMonster[gameInfo.otherMonsterNum].taugh = isTaunt(matio[0]);
+		//		gameInfo.otherMonster[gameInfo.otherMonsterNum].x = x;
+		//		gameInfo.otherMonster[gameInfo.otherMonsterNum].y = y;
+		//		cout << "出牌阶段：对方场上卡牌信息：是否嘲讽：" << gameInfo.otherMonster[gameInfo.otherMonsterNum].taugh << " 位置:" << gameInfo.otherMonster[gameInfo.otherMonsterNum].x << " " << gameInfo.otherMonster[gameInfo.otherMonsterNum].y << endl;
+		//		gameInfo.otherMonsterNum++;
+		//		/*imshow("sub",sub);
+		//		waitKey(0);*/
+		//	}
+		//	++itc;
+		//}
+	}
 	bool isTaunt(Mat src)
 	{
 		Mat src2,image;
 		src.copyTo(src2);
 		src.copyTo(image);
+		//imshow("image", src);
+		//waitKey(0);
 		double sum = 0;
 		for (int i = 0; i<src2.rows; i++)//阈值处理，白色留下，其余改为黑色
 		{
@@ -694,10 +817,10 @@ public:
 		bool bIsTaunt = (sum > 2500);
 		if (bIsTaunt) {
 			cout << "发现嘲讽"<<endl;
-			/*imshow("image", src2);
-			waitKey(0);*/
+			//imshow("image", src);
+			//waitKey(0);
 		}
-		return false;
+		return bIsTaunt;
 	}
 	
 	int recoImageNum(Mat src)
@@ -776,122 +899,6 @@ public:
 
 		}
 		return sum;
-	}
-	void recoOtherMonster(Mat src, GameInfo &gameInfo)
-	{
-		Mat floor = imread("HS/other_floor.png", 0);
-		Mat out;
-		Mat gray;
-		cvtColor(src, gray, CV_BGR2GRAY);
-		/*imshow("yuan", gray);
-		imshow("floor", floor);*/
-		subtract(floor, gray, out);
-		/*imshow("test", out);
-		waitKey(0);*/
-		Mat thr;
-		threshold(out, thr, 50, 255, CV_THRESH_BINARY);
-		//Mat element = getStructuringElement(MORPH_RECT, Size(3, 3));//腐蚀膨胀效果不好
-		//dilate(thr, thr, element);
-		//erode(thr, thr, element);
-		//dilate(thr, thr, element);
-		//erode(thr, thr, element);
-		
-		int sum = 0,bg=0,ed=0;
-		for (int i = 0; i < thr.cols; ++i)
-		{
-			if (thr.at<uchar>(thr.rows / 2, i) == 255)
-			{
-				if (bg == 0) bg = i;
-				else ed = i;
-			}
-		}
-		cout << bg << " " << ed << endl;
-		const int MonsterWidth = MONSTERWIDTH + MONSTERSPAN;
-		int count = (ed - bg + 50 - MONSTERSPAN) / MonsterWidth;
-		gameInfo.otherMonsterNum = 0;
-		for (int i = 0; i < count; ++i)
-		{
-			Rect r0(bg + i * MonsterWidth, 0, MonsterWidth, thr.rows);
-			Mat temp;
-			if (r0.x + r0.width>src.cols || r0.y + r0.height>src.rows) continue;
-			Rect rcMonsterInner(bg + (i - 1) * MonsterWidth + MONSTERWIDTH, 0, MONSTERWIDTH, MONSTERHEIGHT);
-			src(rcMonsterInner).copyTo(temp);
-			//imshow("tests", temp);
-			//waitKey(0);
-			int x = r0.x+r0.width / 2;
-			int y = r0.height / 2;
-			x += otherFloorRect.x + 10;
-			y +=  otherFloorRect.y + 30;
-
-			ControlMouse *cm = ControlMouse::getInstance();
-			cm->moveToPosition(x, y);
-			
-			//imshow("1",temp);
-			//waitKey(0);
-			gameInfo.otherMonster[gameInfo.otherMonsterNum].taugh = isTaunt(temp);
-			gameInfo.otherMonster[gameInfo.otherMonsterNum].x = x;
-			gameInfo.otherMonster[gameInfo.otherMonsterNum].y = y;
-
-			//识别数值
-			Mat attackImage;
-			temp(Rect(0, 0, temp.cols / 2, temp.rows)).copyTo(attackImage);//读取左侧数字
-			
-			gameInfo.otherMonster[gameInfo.otherMonsterNum].attack = recoImageNum(attackImage);
-			Mat lifeImage;
-			temp(Rect(temp.cols / 2, 0, temp.cols/2, temp.rows)).copyTo(lifeImage);//读取左侧数字
-			gameInfo.otherMonster[gameInfo.otherMonsterNum].life = recoImageNum(lifeImage);
-
-			cout << "出牌阶段：对方场上卡牌信息：是否嘲讽：" << gameInfo.otherMonster[gameInfo.otherMonsterNum].taugh << " 攻击：" << gameInfo.otherMonster[gameInfo.otherMonsterNum].attack << " 生命：" << gameInfo.otherMonster[gameInfo.otherMonsterNum].life<< " 位置:" << gameInfo.otherMonster[gameInfo.otherMonsterNum].x << " " << gameInfo.otherMonster[gameInfo.otherMonsterNum].y << endl;
-			gameInfo.otherMonsterNum++;
-			/*imshow("sub",sub);
-			waitKey(0);*/
-		}
-
-		//vector<std::vector<Point>> contours;
-		//findContours(thr,			//图像
-		//	contours,				//轮廓点
-		//	//包含图像拓扑结构的信息（可选参数，这里没有选）
-		//	CV_RETR_EXTERNAL,			//获取轮廓的方法（这里获取外围轮廓）
-		//	CV_CHAIN_APPROX_NONE);		//轮廓近似的方法（这里不近似，获取全部轮廓）
-
-		//int cmin = 100;
-		//Mat matio[10];
-		//std::vector<std::vector<Point>>::const_iterator itc = contours.begin();
-		//gameInfo.otherMonsterNum = 0;
-		//for (int i = 0; i < contours.size(); ++i)
-		//{
-		//	cout << itc->size() << endl;
-		//	if (itc->size() > cmin)
-		//	{
-		//		Rect r0 = boundingRect(Mat(contours[i]));
-		//		if (r0.width >= r0.height) continue;
-		//		src(r0).copyTo(matio[0]);
-		//		imshow("tests",matio[0]);
-		//		waitKey(0);
-		//		int x = r0.width/2 ;
-		//		int y = r0.height/2;
-		//		x += 204;
-		//		y +=  229+40;
-		//		/*ControlMouse *cm = ControlMouse::getInstance();
-		//		cm->moveToPosition(x, y);
-		//		Sleep(1000);
-		//		HWND hWnd = ::FindWindow("UnityWndClass", CARDGAME);
-		//		Mat image = getCurrentImage(hWnd);
-		//		Mat sub;
-		//		image(Rect(x, y, 102, 126)).copyTo(sub);
-		//		imshow("sub", sub);
-		//		waitKey(0);*/
-		//	
-		//		gameInfo.otherMonster[gameInfo.otherMonsterNum].taugh = isTaunt(matio[0]);
-		//		gameInfo.otherMonster[gameInfo.otherMonsterNum].x = x;
-		//		gameInfo.otherMonster[gameInfo.otherMonsterNum].y = y;
-		//		cout << "出牌阶段：对方场上卡牌信息：是否嘲讽：" << gameInfo.otherMonster[gameInfo.otherMonsterNum].taugh << " 位置:" << gameInfo.otherMonster[gameInfo.otherMonsterNum].x << " " << gameInfo.otherMonster[gameInfo.otherMonsterNum].y << endl;
-		//		gameInfo.otherMonsterNum++;
-		//		/*imshow("sub",sub);
-		//		waitKey(0);*/
-		//	}
-		//	++itc;
-		//}
 	}
 	void selfTurn(Mat src, GameInfo &gameInfo)//处理出牌阶段场景
 	{
