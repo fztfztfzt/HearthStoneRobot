@@ -683,13 +683,13 @@ void ProcessImage::recoOtherMonster(Mat src, GameInfo &gameInfo)
 	for (int i = 0; i < count; ++i)
 	{
 		Rect r0(bg + i * MonsterWidth, 0, MonsterWidth, thr.rows);
-		Mat temp;
 		if (r0.x + r0.width > src.cols || r0.y + r0.height > src.rows) continue;
 		int MonstersSpan = 0;
 		if (i > 0) {
 			MonstersSpan = (i - 1) * MONSTERSPAN;
 		}
-		Rect rcMonsterInner(bg + i * MonsterWidth + MonstersSpan, 0, MONSTERWIDTH, MONSTERHEIGHT);
+		Rect rcMonsterInner(bg + i * MONSTERWIDTH + MonstersSpan, 0, MONSTERWIDTH, MONSTERHEIGHT);
+		Mat temp;
 		src(rcMonsterInner).copyTo(temp);
 		/*imshow("tests", temp);
 		waitKey(0);*/
@@ -1174,9 +1174,9 @@ void ProcessImage::otherTurn(Mat src, GameInfo &gameInfo)
 	{
 		Sleep(5000);
 		gameInfo.state = STATE_SELFTURN_PLAY;
-		//process(gameInfo);
-		Mat src = getCurrentImage();
-		selfTurn(src, gameInfo);
+		process(gameInfo);
+		//Mat src = getCurrentImage();
+		//selfTurn(src, gameInfo);
 	}
 }
 
@@ -1198,7 +1198,6 @@ float ProcessImage::compareImageBySub(Mat &a, Mat &a2)
 			{
 				sum++;
 			}
-
 		}
 	}
 	return (float)sum / (a.rows*a.cols);

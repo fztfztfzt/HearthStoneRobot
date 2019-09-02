@@ -1,6 +1,9 @@
 #include "OutputInfo.h"
 //#include<Windows.h>
 
+//#pragma comment( linker, "/subsystem:windows /entry:mainCRTStartup" )
+
+
 using namespace std;
 
 COutputInfo::COutputInfo(std::string outputFile)

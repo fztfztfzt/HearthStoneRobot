@@ -51,6 +51,9 @@
     <ClCompile Include="controlMouse.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ai.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="processImage.h">
@@ -98,6 +101,9 @@
     <ClInclude Include="OutputInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\SVM.xml" />
@@ -120,5 +126,13 @@
     <Image Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\testImage3.jpg">
       <Filter>资源文件</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Robot.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="NatvisFile.natvis" />
   </ItemGroup>
 </Project>

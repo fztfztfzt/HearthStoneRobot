@@ -70,6 +70,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ai.cpp" />
     <ClCompile Include="controlMouse.cpp" />
     <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\feature.cpp" />
     <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\loadMNIST.cpp" />
@@ -98,6 +99,7 @@
     <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\SVM_on_handWritten.h" />
     <ClInclude Include="OutputInfo.h" />
     <ClInclude Include="processImage.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\SVM.xml" />
@@ -114,6 +116,12 @@
     <Image Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\testImage.jpg" />
     <Image Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\testImage2.jpg" />
     <Image Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\testImage3.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Robot.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="NatvisFile.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

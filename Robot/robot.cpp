@@ -4,7 +4,6 @@
 #include "ai.h"
 #include "OutputInfo.h"
 
-//#pragma comment( linker, "/subsystem:windows /entry:mainCRTStartup" )
 int main()
 {
 	COutputInfo outputInfo;
