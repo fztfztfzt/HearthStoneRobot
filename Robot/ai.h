@@ -15,11 +15,11 @@ bool compareAttribute(Card a, Card b) {
 
 class AI
 {
-	HWND hWnd;
 	ControlMouse *controlMouse;
 	int havePlayNum;
 public:
-	AI(HWND h) :hWnd(h){
+	AI()
+	{
 		controlMouse = ControlMouse::getInstance();
 	}
 	void startGame(GameInfo &gameInfo)

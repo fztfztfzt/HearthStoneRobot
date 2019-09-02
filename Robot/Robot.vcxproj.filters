@@ -42,6 +42,15 @@
     <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\SVM_on_handWritten.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="OutputInfo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="processimage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="controlMouse.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="processImage.h">
@@ -84,6 +93,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\SVM_on_handWritten.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
