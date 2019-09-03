@@ -1,7 +1,7 @@
 #include "OutputInfo.h"
 //#include<Windows.h>
 
-//#pragma comment( linker, "/subsystem:windows /entry:mainCRTStartup" )
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
 
 using namespace std;

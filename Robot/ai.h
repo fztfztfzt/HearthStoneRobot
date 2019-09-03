@@ -4,9 +4,7 @@
 #include "ControlMouse.h"
 #include "processImage.h"
 #include <algorithm>
-bool compareSpend(Card a, Card b);
 
-bool compareAttribute(Card a, Card b);
 
 class AI
 {
