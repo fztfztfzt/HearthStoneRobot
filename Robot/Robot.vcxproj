@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -13,18 +13,19 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0B078743-1899-49C2-8668-07120B998F51}</ProjectGuid>
     <RootNamespace>Robot</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -39,8 +40,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>E:\opencv\build\include;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\opencv\build\x86\vc12\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>F:\MLDL\opencv\modules\video\include;F:\MLDL\opencv\modules\stitching\include;F:\MLDL\opencv\modules\photo\include\;F:\MLDL\opencv\modules\objdetect\include;F:\MLDL\opencv\modules\ml\include;F:\MLDL\opencv\modules\imgproc\include;F:\MLDL\opencv\modules\videoio\include;F:\MLDL\opencv\modules\imgcodecs\include;F:\MLDL\opencv\modules\highgui\include\;F:\MLDL\opencv\modules\dnn\include;F:\MLDL\opencv\modules\imgproc\include\opencv2;F:\MLDL\opencv\modules\flann\include;F:\MLDL\opencv\modules\features2d\include;F:\MLDL\opencv\modules\calib3d\include;F:\MLDL\opencv\modules\core\include;F:\MLDL\opencv\build;F:\MLDL\opencv\include;$(IncludePath)</IncludePath>
+    <LibraryPath>F:\MLDL\opencv\build\lib\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -51,7 +52,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opencv_calib3d2411d.lib;opencv_contrib2411d.lib;opencv_core2411d.lib;opencv_features2d2411d.lib;opencv_flann2411d.lib;opencv_gpu2411d.lib;opencv_highgui2411d.lib;opencv_imgproc2411d.lib;opencv_legacy2411d.lib;opencv_ml2411d.lib;opencv_nonfree2411d.lib;opencv_objdetect2411d.lib;opencv_ocl2411d.lib;opencv_photo2411d.lib;opencv_stitching2411d.lib;opencv_superres2411d.lib;opencv_ts2411d.lib;opencv_video2411d.lib;opencv_videostab2411d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_calib3d411d.lib;opencv_core411d.lib;opencv_features2d411d.lib;opencv_flann411d.lib;opencv_highgui411d.lib;opencv_imgproc411d.lib;opencv_ml411d.lib;opencv_objdetect411d.lib;opencv_photo411d.lib;opencv_stitching411d.lib;opencv_ts411d.lib;opencv_video411d.lib;F:\MLDL\opencv\build\lib\Debug\*.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -69,6 +70,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ai.cpp" />
+    <ClCompile Include="controlMouse.cpp" />
+    <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\feature.cpp" />
+    <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\loadMNIST.cpp" />
+    <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\mousedraw.cpp" />
+    <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\preprocess.cpp" />
+    <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\recognize.cpp" />
+    <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\segment.cpp" />
+    <ClCompile Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\SVM_on_handWritten.cpp" />
+    <ClCompile Include="OutputInfo.cpp" />
+    <ClCompile Include="processimage.cpp" />
     <ClCompile Include="robot.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -76,7 +88,40 @@
     <ClInclude Include="ControlMouse.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="gameInfo.h" />
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\features.h" />
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\global.h" />
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\loadMNIST.h" />
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\mousedraw.h" />
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\mycore.h" />
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\preprocess.h" />
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\recognize.h" />
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\segment.h" />
+    <ClInclude Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\SVM_on_handWritten.h" />
+    <ClInclude Include="OutputInfo.h" />
     <ClInclude Include="processImage.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\SVM.xml" />
+    <Xml Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\SVM2.xml" />
+    <Xml Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\SVM3.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\t10k-images.idx3-ubyte" />
+    <None Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\t10k-labels.idx1-ubyte" />
+    <None Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\train-images.idx3-ubyte" />
+    <None Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\train-labels.idx1-ubyte" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\testImage.jpg" />
+    <Image Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\testImage2.jpg" />
+    <Image Include="handWritten-digit-recognition-based-on-OpenCV\handWritten digit recognition based on OpenCV\testImage3.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Robot.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="NatvisFile.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

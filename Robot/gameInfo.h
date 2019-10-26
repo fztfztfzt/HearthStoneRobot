@@ -1,6 +1,5 @@
 #pragma once
 #include <iostream>
-#include <string>
 #include "define.h"
 class Card
 {
@@ -31,7 +30,7 @@ class GameInfo
 public:
 	GameInfo()
 	{
-		state = STATE_SELFTURN_FIGHT;
+		state = STATE_STARTGAME;
 		currentSpend = 1;
 		couldUseSpend = 1;
 		haveWeapon = false;

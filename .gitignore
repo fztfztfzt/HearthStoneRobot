@@ -1,0 +1,5 @@
+.vs
+Robot/Debug/*
+Robot/Robot.VC.db
+Robot/Robot.VC.VC.opendb
+Robot/cout.txt
